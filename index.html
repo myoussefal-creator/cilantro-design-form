@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cilantro Store Requirements</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 "Segoe UI",Arial,sans-serif}
+[hidden]{display:none!important}
+
+
+:root{
+  --ink:#4a2f22; --body:#2f1c13; --muted:#6b5b4e; --line:#e2d9ce; --label:#faf3ea; --auto:#f4f1ea;
+  --bg:#f6f1ea; --card:#ffffff; --accent:#5f7d47; --link:#1f5fa8; --red:#b03a2e;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--body);font:15px/1.45 "Segoe UI",Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 80px}
+h1{color:var(--ink);font-size:22px;margin:4px 0 2px;text-align:center;letter-spacing:.3px}
+.sub{color:var(--muted);text-align:center;font-style:italic;font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:14px 0}
+.bar{color:#fff;border-radius:8px 8px 0 0;padding:10px 14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.bar small{font-weight:400;font-style:italic;opacity:.9}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:18px 0;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(180px,38%) 1fr;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.lab{background:var(--label);padding:10px 12px;font-weight:600;color:var(--ink);font-size:14px}
+.val{padding:8px 12px;min-width:0}
+input[type=text],input[type=date],input[type=password],textarea{width:100%;font:inherit;padding:7px 9px;border:1px solid #cfc3b5;border-radius:6px;background:#fffdf9;color:var(--body)}
+textarea{min-height:58px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid #c9a27e;border-color:#c9a27e}
+.opts{display:flex;flex-wrap:wrap;gap:6px 8px}
+.opt{display:inline-flex;align-items:center;gap:6px;border:1px solid #d6cabc;border-radius:18px;padding:4px 11px 4px 8px;cursor:pointer;user-select:none;background:#fff;font-size:14px}
+.opt input{width:17px;height:17px;accent-color:var(--accent);margin:0;cursor:pointer}
+.opt.on{background:#eef4e8;border-color:var(--accent);font-weight:600}
+.extra{margin-top:7px;font-size:13px;color:var(--muted);font-style:italic}
+.extra input{margin-top:3px;font-style:normal}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;padding:10px 12px}
+.qtab{width:100%;border-collapse:collapse}
+.qtab td,.qtab th{border-top:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left;font-size:14px}
+.qtab th{background:#4f6b57;color:#fff;font-size:13px}
+.qtab td.n{width:36px;text-align:center;font-weight:700;color:var(--ink);background:var(--label)}
+.qtab td.c{width:44px;text-align:center}
+.qtab input{width:19px;height:19px;accent-color:var(--accent);cursor:pointer}
+.ar{direction:rtl;text-align:right;color:var(--muted);font-size:14px;margin-top:3px;font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+.info{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px 18px;font-size:14px}
+.info b{color:var(--ink);display:block;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.howto{background:#f3f7ef;border:1px solid #d5e2c9}
+.howto ol{margin:6px 0 0 18px;padding:0}
+.btn{font:inherit;font-weight:600;border:0;border-radius:8px;padding:10px 18px;cursor:pointer;background:var(--ink);color:#fff}
+.btn.sec2{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.btn.green{background:var(--accent)}
+.btn.small{padding:6px 11px;font-size:13px}
+.btn:disabled{opacity:.55;cursor:default}
+.status{position:fixed;right:16px;bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.status.err{color:var(--red);border-color:var(--red)}
+.banner{border-radius:8px;padding:12px 14px;margin:12px 0;font-weight:600}
+.banner.ok{background:#eef4e8;border:1px solid var(--accent);color:#3d5a2c}
+.banner.err{background:#fbeceb;border:1px solid var(--red);color:var(--red)}
+.submitbox{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.submitbox label{flex:1;min-width:220px;font-weight:600;color:var(--ink);font-size:14px}
+/* summary */
+table.sum{width:100%;border-collapse:collapse;background:#fff}
+table.sum th{background:var(--muted);color:#fff;text-align:left;padding:8px 10px;font-size:13px}
+table.sum td{border-top:1px solid var(--line);padding:7px 10px;font-size:14px;vertical-align:top}
+table.sum td.req{background:var(--label);width:34%}
+table.sum td.v{background:var(--auto)}
+table.sum td.src{width:110px;text-align:center;font-style:italic;font-size:12px}
+table.sum tr.grp td{background:#ede6dc;font-weight:700;font-size:12px;letter-spacing:.4px;text-transform:uppercase}
+.pill{display:inline-block;margin:1px 6px 1px 0;white-space:nowrap}
+.pill.off{color:#a5998e}
+.pill.on{font-weight:700;color:var(--body)}
+.empty{color:#a5998e}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border-radius:12px;padding:3px 9px;border:1px solid var(--line);background:#fff}
+.chip.done{background:#eef4e8;border-color:var(--accent);color:#3d5a2c;font-weight:600}
+.chip.wip{background:#fff7e6;border-color:#e0b35a;color:#8a5d00}
+.links{width:100%;border-collapse:collapse;margin-top:10px}
+.links td{border-top:1px solid var(--line);padding:7px 6px;font-size:14px;vertical-align:middle}
+.links td:last-child{text-align:right;white-space:nowrap}
+.muted{color:var(--muted)}
+.center{text-align:center}
+@media (max-width:640px){
+  .row{grid-template-columns:1fr}
+  .lab{padding-bottom:4px}
+  table.sum td.src{width:70px}
+  .links td:last-child{white-space:normal}
+}
+@media print{
+  body{background:#fff}
+  .noprint,.status{display:none!important}
+  .sec,.card{break-inside:avoid-page}
+  tr{break-inside:avoid}
+}
+
+.grid.seats{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.opt.seatcard{flex-direction:column;align-items:stretch;border-radius:10px;padding:6px 6px 8px;gap:6px}
+.opt.seatcard svg{display:block;width:100%;height:auto;border-radius:8px}
+.opt.seatcard span{display:flex;align-items:center;gap:6px;justify-content:center;text-align:center}
+.opt.seatcard.on{box-shadow:0 0 0 2px var(--accent)}
+.seatsum{display:flex;flex-wrap:wrap;gap:8px}
+.seatsum figure{margin:0;width:120px;font-size:12px;text-align:center}
+.seatsum svg{display:block;width:100%;height:auto;border-radius:6px;border:1px solid var(--line)}
+@media print{.seatsum figure{width:100px}}
+
+:root{color-scheme:light}
+body{background:var(--bg);color:var(--body)}
+.wrap{padding-inline:16px}
+.deps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.dep{display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:8px;padding:12px 14px;cursor:pointer;font:inherit;color:var(--body)}
+.dep:hover,.dep:focus-visible{border-color:var(--c);box-shadow:0 2px 10px rgba(74,47,34,.12);outline:none}
+.dep b{color:var(--c);font-size:16px}
+.dep span{color:var(--link);font-weight:600;font-size:13px}
+.back{background:none;border:0;color:var(--link);font:inherit;font-weight:600;cursor:pointer;padding:4px 0}
+.msg{white-space:pre-wrap;word-break:break-all;background:#fbf8f3;border:1px dashed #cdbfae;border-radius:6px;padding:10px;font:12px/1.4 Consolas,monospace;max-height:140px;overflow:auto;color:var(--body)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.actions a{text-decoration:none;display:inline-block}
+.pmhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.step{font-weight:700;color:var(--ink);margin:0 0 6px}
+.note{font-size:13px;color:var(--muted)}
+.sumwrap{overflow-x:auto}
+:focus-visible{outline:2px solid #c9a27e;outline-offset:2px}
+</style>
+</head>
+<body>
+
+
+<div class="wrap" id="app"></div>
+<div class="status noprint" id="status" hidden></div>
+
+<script>var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",e={};function t(r,o){if(!e[r]){e[r]={};for(var n=0;n<r.length;n++)e[r][r.charAt(n)]=n}return e[r][o]}var i={compressToBase64:function(r){if(null==r)return"";var n=i._compress(r,6,function(r){return o.charAt(r)});switch(n.length%4){default:case 0:return n;case 1:return n+"===";case 2:return n+"==";case 3:return n+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(n){return t(o,r.charAt(n))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(r){return null==r?"":""==r?null:i._decompress(r.length,16384,function(o){return r.charCodeAt(o)-32})},compressToUint8Array:function(r){for(var o=i.compress(r),n=new Uint8Array(2*o.length),e=0,t=o.length;e<t;e++){var s=o.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null==o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;e<t;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return n.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return t(n,r.charAt(o))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==o-1){d.push(n(m));break}v++}return d.join("")},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return r.charCodeAt(o)})},_decompress:function(o,n,e){var t,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:e(0),position:n,index:1};for(t=0;t<3;t+=1)l[t]=t;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>o)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module?module.exports=LZString:"undefined"!=typeof angular&&null!=angular&&angular.module("LZString",[]).factory("LZString",function(){return LZString});</script>
+<script>
+const SPEC = {"sections": [{"code": "branch", "title": "BRANCH IDENTIFICATION", "by": null, "fields": ["br_name", "br_address", "br_location", "br_code", "br_date", "br_type", "br_cat", "br_open"]}, {"code": "leasing", "title": "1. LEASING & EXPANSION", "by": "Leasing & Expansion", "fields": ["ls_sector", "ls_ll", "ls_start", "ls_in", "ls_out", "ls_tot", "ls_floors", "ls_perfloor", "ls_facade", "ls_facade_len", "ls_sign", "ls_sign_restr", "ls_dt", "ls_deliv", "ls_park", "ls_handover", "ls_guide", "ls_notes"]}, {"code": "eng", "title": "2. ENGINEERING", "by": "Engineering", "fields": ["en_act_in", "en_act_out", "en_load", "en_supply", "en_water", "en_drain", "en_gas", "en_tiein", "en_hvac", "en_hvac_tr", "en_fresh", "en_ff", "en_fa", "en_struct", "en_mezz", "en_gen", "en_notes"]}, {"code": "mkt", "title": "3. MARKETING", "by": "Marketing", "fields": ["mk_concept", "mk_customer", "mk_extsign", "mk_logo", "mk_wall", "mk_window", "mk_insta", "mk_season", "mk_promo", "mk_retail", "mk_menu", "mk_screens", "mk_notes"]}, {"code": "ops", "title": "4. OPERATIONS", "by": "Operations", "fields": ["op_staff", "op_seat_in", "op_seat_out", "op_smoke", "op_nosmoke", "op_counter", "op_queue", "op_pos", "op_dtw", "op_rider", "op_pickup", "op_intercom", "op_kitchen", "op_store_in", "op_store_area", "op_store_rem", "op_lockers", "op_stafftoilet", "op_guesttoilet", "op_prayer", "op_notes", "op_seating", "op_chairs"]}, {"code": "qa", "title": "5. QUALITY", "by": "Quality", "fields": ["qa_hand", "qa_food", "qa_filter", "qa_wtest", "qa_temp", "qa_waste", "qa_disposal", "qa_chem", "qa_cleaneq", "qa_pest", "qa_fly", "qa_health", "qa_hsign", "qa_extra", "qa_notes"]}, {"code": "fm", "title": "6. FACILITY & MAINTENANCE", "by": "Facility & Maintenance", "fields": ["fm_tank", "fm_grease", "fm_alarm", "fm_access", "fm_pm", "fm_notes"]}, {"code": "it", "title": "7. IT", "by": "IT", "fields": ["it_sound", "it_cctv", "it_data", "it_net", "it_gsm", "it_wifi", "it_rack", "it_notes"]}, {"code": "legal", "title": "8. LEGAL", "by": "Legal", "fields": ["lg_special", "lg_trade", "lg_permit", "lg_cd", "lg_meter", "lg_signpermit", "lg_music", "lg_outdoor", "lg_ins", "lg_affect", "lg_notes"]}], "fields": {"br_name": {"type": "text", "key": "br_name", "label": "Branch Name:", "short": "Branch Name", "ml": false, "sec": "branch"}, "br_address": {"type": "text", "key": "br_address", "label": "Address:", "short": "Address", "ml": false, "sec": "branch"}, "br_location": {"type": "text", "key": "br_location", "label": "Location (area / Google Maps link):", "short": "Location", "ml": false, "sec": "branch"}, "br_code": {"type": "text", "key": "br_code", "label": "Branch Code:", "short": "Branch Code", "ml": false, "sec": "branch"}, "br_date": {"type": "date", "key": "br_date", "label": "Date of Request:", "short": "Date of Request", "sec": "branch"}, "br_type": {"type": "choice", "key": "br_type", "label": "Project Type:", "opts": ["New Store", "Renovation"], "extra": null, "short": "Project Type", "grid": false, "sec": "branch"}, "br_cat": {"type": "choice", "key": "br_cat", "label": "Shop Category:", "opts": ["Iconic", "Premium", "Economic"], "extra": null, "short": "Shop Category", "grid": false, "sec": "branch"}, "br_open": {"type": "date", "key": "br_open", "label": "Target Opening Date:", "short": "Target Opening Date", "sec": "branch"}, "ls_sector": {"type": "choice", "key": "ls_sector", "label": "Sector:", "opts": ["Mall", "Street", "Gas Station", "DELTA", "Medical", "Corporate", "University"], "extra": null, "short": "Sector", "grid": false, "sec": "leasing"}, "ls_ll": {"type": "text", "key": "ls_ll", "label": "Developer / LL:", "short": "Developer / Landlord", "ml": false, "sec": "leasing"}, "ls_start": {"type": "date", "key": "ls_start", "label": "Lease Start Date:", "short": "Lease Start Date", "sec": "leasing"}, "ls_in": {"type": "text", "key": "ls_in", "label": "Indoor Area as per contract (m²):", "short": "Indoor Area (m²)", "ml": false, "sec": "leasing"}, "ls_out": {"type": "text", "key": "ls_out", "label": "Outdoor Area as per contract (m²):", "short": "Outdoor Area (m²)", "ml": false, "sec": "leasing"}, "ls_tot": {"type": "text", "key": "ls_tot", "label": "Total Area as per contract (m²):", "short": "Total Area (m²)", "ml": false, "sec": "leasing"}, "ls_floors": {"type": "choice", "key": "ls_floors", "label": "Number of Floors:", "opts": ["One Floor", "Two Floors", "More than Two"], "extra": null, "short": "Number of Floors", "grid": false, "sec": "leasing"}, "ls_perfloor": {"type": "text", "key": "ls_perfloor", "label": "If multiple floors - area per floor as per contract:", "short": "Area per Floor", "ml": true, "sec": "leasing"}, "ls_facade": {"type": "choice", "key": "ls_facade", "label": "Facade Finished by LL:", "opts": ["Yes", "No"], "extra": null, "short": "Facade Finished by LL", "grid": false, "sec": "leasing"}, "ls_facade_len": {"type": "text", "key": "ls_facade_len", "label": "Facade Length (m):", "short": "Facade Length (m)", "ml": false, "sec": "leasing"}, "ls_sign": {"type": "choice", "key": "ls_sign", "label": "Signage Location Available:", "opts": ["Yes", "No"], "extra": null, "short": "Signage Location Available", "grid": false, "sec": "leasing"}, "ls_sign_restr": {"type": "text", "key": "ls_sign_restr", "label": "Signage Restrictions from Landlord:", "short": "Signage Restrictions (LL)", "ml": true, "sec": "leasing"}, "ls_dt": {"type": "choice", "key": "ls_dt", "label": "Drive Thru:", "opts": ["Yes", "No"], "extra": null, "short": "Drive Thru", "grid": false, "sec": "leasing"}, "ls_deliv": {"type": "choice", "key": "ls_deliv", "label": "Delivery / Loading Access:", "opts": ["Yes", "No"], "extra": null, "short": "Delivery / Loading Access", "grid": false, "sec": "leasing"}, "ls_park": {"type": "choice", "key": "ls_park", "label": "Customer Parking Available:", "opts": ["Yes", "No"], "extra": null, "short": "Customer Parking", "grid": false, "sec": "leasing"}, "ls_handover": {"type": "choice", "key": "ls_handover", "label": "Handover Condition:", "opts": ["Shell & Core", "Semi-Finished", "Fully Fitted", "Existing Store"], "extra": null, "short": "Handover Condition", "grid": false, "sec": "leasing"}, "ls_guide": {"type": "text", "key": "ls_guide", "label": "Landlord Restrictions / Fit-Out Guidelines:", "short": "Landlord Fit-Out Guidelines", "ml": true, "sec": "leasing"}, "ls_notes": {"type": "text", "key": "ls_notes", "label": "Notes:", "short": "Leasing Notes", "ml": true, "sec": "leasing"}, "en_act_in": {"type": "text", "key": "en_act_in", "label": "Actual Indoor Area - as measured on site (m²):", "short": "Actual Indoor Area - site measured (m²)", "ml": false, "sec": "eng"}, "en_act_out": {"type": "text", "key": "en_act_out", "label": "Actual Outdoor Area - as measured on site (m²):", "short": "Actual Outdoor Area - site measured (m²)", "ml": false, "sec": "eng"}, "en_load": {"type": "text", "key": "en_load", "label": "Electrical Load Required (kW / kVA):", "short": "Electrical Load Required (kW / kVA)", "ml": false, "sec": "eng"}, "en_supply": {"type": "text", "key": "en_supply", "label": "Electrical Supply Available from LL (kW):", "short": "Electrical Supply Available (kW)", "ml": false, "sec": "eng"}, "en_water": {"type": "choice", "key": "en_water", "label": "Water Supply Point Available:", "opts": ["Yes", "No"], "extra": ["en_water_size", "Size"], "short": "Water Supply Point", "grid": false, "sec": "eng"}, "en_drain": {"type": "choice", "key": "en_drain", "label": "Drainage Point Available:", "opts": ["Yes", "No"], "extra": ["en_drain_size", "Size"], "short": "Drainage Point", "grid": false, "sec": "eng"}, "en_gas": {"type": "choice", "key": "en_gas", "label": "Gas Supply Required:", "opts": ["Yes", "No"], "extra": null, "short": "Gas Supply Required", "grid": false, "sec": "eng"}, "en_tiein": {"type": "text", "key": "en_tiein", "label": "MEP Tie-In Locations & Capacities:", "short": "MEP Tie-In Locations & Capacities", "ml": true, "sec": "eng"}, "en_hvac": {"type": "choice", "key": "en_hvac", "label": "Preferred HVAC Type:", "opts": ["Exposed", "Hi-Wall Split", "VRF", "Other"], "extra": ["en_hvac_other", "If other"], "short": "Preferred HVAC Type", "grid": false, "sec": "eng"}, "en_hvac_tr": {"type": "text", "key": "en_hvac_tr", "label": "HVAC Capacity Required (TR):", "short": "HVAC Capacity Required (TR)", "ml": false, "sec": "eng"}, "en_fresh": {"type": "text", "key": "en_fresh", "label": "Fresh Air / Extraction Requirements:", "short": "Fresh Air / Extraction", "ml": true, "sec": "eng"}, "en_ff": {"type": "choice", "key": "en_ff", "label": "Fire Fighting System:", "opts": ["Sprinkler", "FM200", "Extinguishers Only", "As per Authority"], "extra": null, "short": "Fire Fighting System", "grid": false, "sec": "eng"}, "en_fa": {"type": "text", "key": "en_fa", "label": "Fire Alarm Requirement:", "short": "Fire Alarm Requirement", "ml": true, "sec": "eng"}, "en_struct": {"type": "choice", "key": "en_struct", "label": "Structural Modifications Required:", "opts": ["Yes", "No"], "extra": ["en_struct_desc", "If yes - describe"], "short": "Structural Modifications", "grid": false, "sec": "eng"}, "en_mezz": {"type": "choice", "key": "en_mezz", "label": "Mezzanine Required:", "opts": ["Yes", "No"], "extra": null, "short": "Mezzanine Required", "grid": false, "sec": "eng"}, "en_gen": {"type": "choice", "key": "en_gen", "label": "Backup Power / Generator:", "opts": ["Yes", "No"], "extra": null, "short": "Backup Power / Generator", "grid": false, "sec": "eng"}, "en_notes": {"type": "text", "key": "en_notes", "label": "Notes:", "short": "Engineering Notes", "ml": true, "sec": "eng"}, "mk_concept": {"type": "text", "key": "mk_concept", "label": "Store Concept / Design Brief (Look & Feel):", "short": "Store Concept / Design Brief", "ml": true, "sec": "mkt"}, "mk_customer": {"type": "text", "key": "mk_customer", "label": "Target Customer Profile (Demography):", "short": "Target Customer Profile", "ml": true, "sec": "mkt"}, "mk_extsign": {"type": "choice", "key": "mk_extsign", "label": "Exterior Signage (other than main signage):", "opts": ["Yes", "No"], "extra": ["mk_extsign_det", "If yes - details"], "short": "Exterior Signage (other than main)", "grid": false, "sec": "mkt"}, "mk_logo": {"type": "choice", "key": "mk_logo", "label": "Illuminated Logo:", "opts": ["Yes", "No"], "extra": null, "short": "Illuminated Logo", "grid": false, "sec": "mkt"}, "mk_wall": {"type": "choice", "key": "mk_wall", "label": "Interior Wall Branding:", "opts": ["Yes", "No"], "extra": null, "short": "Interior Wall Branding", "grid": false, "sec": "mkt"}, "mk_window": {"type": "choice", "key": "mk_window", "label": "Window Graphics (doodles on glass):", "opts": ["Yes", "No"], "extra": null, "short": "Window Graphics", "grid": false, "sec": "mkt"}, "mk_insta": {"type": "choice", "key": "mk_insta", "label": "Instagrammable Wall / Photo Spot:", "opts": ["Yes", "No"], "extra": ["mk_insta_det", "If yes - location & concept"], "short": "Instagrammable Wall / Photo Spot", "grid": false, "sec": "mkt"}, "mk_season": {"type": "choice", "key": "mk_season", "label": "Seasonal Display Area:", "opts": ["Yes", "No"], "extra": ["mk_season_det", "If yes - location & concept"], "short": "Seasonal Display Area", "grid": false, "sec": "mkt"}, "mk_promo": {"type": "choice", "key": "mk_promo", "label": "Promotional Display Area:", "opts": ["Yes", "No"], "extra": ["mk_promo_det", "If yes - location & concept"], "short": "Promotional Display Area", "grid": false, "sec": "mkt"}, "mk_retail": {"type": "choice", "key": "mk_retail", "label": "Retail Merchandise Display (beans, mugs):", "opts": ["Yes", "No"], "extra": null, "short": "Retail Merchandise Display", "grid": false, "sec": "mkt"}, "mk_menu": {"type": "choice", "key": "mk_menu", "label": "Menu Board Type:", "opts": ["Digital Screens", "Printed / Static"], "extra": null, "short": "Menu Board Type", "grid": false, "sec": "mkt"}, "mk_screens": {"type": "text", "key": "mk_screens", "label": "Number of Menu Board Screens:", "short": "Number of Menu Board Screens", "ml": false, "sec": "mkt"}, "mk_notes": {"type": "text", "key": "mk_notes", "label": "Notes:", "short": "Marketing Notes", "ml": true, "sec": "mkt"}, "op_staff": {"type": "text", "key": "op_staff", "label": "Staff Headcount - Peak:", "short": "Staff Headcount - Peak", "ml": false, "sec": "ops"}, "op_seat_in": {"type": "text", "key": "op_seat_in", "label": "Total Seats Required - Indoor:", "short": "Total Seats - Indoor", "ml": false, "sec": "ops"}, "op_seat_out": {"type": "text", "key": "op_seat_out", "label": "Total Seats Required - Outdoor:", "short": "Total Seats - Outdoor", "ml": false, "sec": "ops"}, "op_smoke": {"type": "text", "key": "op_smoke", "label": "Smoking Zone Seats:", "short": "Smoking Zone Seats", "ml": false, "sec": "ops"}, "op_nosmoke": {"type": "text", "key": "op_nosmoke", "label": "Non-Smoking Zone Seats:", "short": "Non-Smoking Zone Seats", "ml": false, "sec": "ops"}, "op_counter": {"type": "choice", "key": "op_counter", "label": "Counter Layout:", "opts": ["Standard", "Modified"], "extra": ["op_counter_mod", "If modified - state modifications"], "short": "Counter Layout", "grid": false, "sec": "ops"}, "op_queue": {"type": "text", "key": "op_queue", "label": "Queue Management (queue line / stanchions):", "short": "Queue Management", "ml": true, "sec": "ops"}, "op_pos": {"type": "text", "key": "op_pos", "label": "Number of POS Stations:", "short": "Number of POS Stations", "ml": false, "sec": "ops"}, "op_dtw": {"type": "choice", "key": "op_dtw", "label": "Drive Thru Window:", "opts": ["Yes", "No"], "extra": null, "short": "Drive Thru Window", "grid": false, "sec": "ops"}, "op_rider": {"type": "choice", "key": "op_rider", "label": "Delivery Rider Waiting Area:", "opts": ["Yes", "No"], "extra": null, "short": "Delivery Rider Waiting Area", "grid": false, "sec": "ops"}, "op_pickup": {"type": "choice", "key": "op_pickup", "label": "Delivery Pickup Shelf / Counter:", "opts": ["Yes", "No"], "extra": null, "short": "Delivery Pickup Shelf / Counter", "grid": false, "sec": "ops"}, "op_intercom": {"type": "choice", "key": "op_intercom", "label": "Intercom Required:", "opts": ["Yes", "No"], "extra": null, "short": "Intercom Required", "grid": false, "sec": "ops"}, "op_kitchen": {"type": "choice", "key": "op_kitchen", "label": "Food Prep / Kitchen Area Required:", "opts": ["Yes", "No"], "extra": ["op_kitchen_area", "Area (m²)"], "short": "Food Prep / Kitchen Area", "grid": false, "sec": "ops"}, "op_store_in": {"type": "choice", "key": "op_store_in", "label": "In-door Storage Required:", "opts": ["Yes", "No"], "extra": null, "short": "In-door Storage", "grid": false, "sec": "ops"}, "op_store_area": {"type": "text", "key": "op_store_area", "label": "Storage Area Required (m²):", "short": "Storage Area Required (m²)", "ml": false, "sec": "ops"}, "op_store_rem": {"type": "choice", "key": "op_store_rem", "label": "Remote Storage Required:", "opts": ["Yes", "No"], "extra": null, "short": "Remote Storage", "grid": false, "sec": "ops"}, "op_lockers": {"type": "choice", "key": "op_lockers", "label": "Lockers Room:", "opts": ["Yes", "No"], "extra": null, "short": "Lockers Room", "grid": false, "sec": "ops"}, "op_stafftoilet": {"type": "choice", "key": "op_stafftoilet", "label": "Staff Toilets:", "opts": ["Yes", "No"], "extra": null, "short": "Staff Toilets", "grid": false, "sec": "ops"}, "op_guesttoilet": {"type": "choice", "key": "op_guesttoilet", "label": "Guest Toilets:", "opts": ["Yes", "No"], "extra": ["op_guesttoilet_no", "Number of guest toilets"], "short": "Guest Toilets", "grid": false, "sec": "ops"}, "op_prayer": {"type": "choice", "key": "op_prayer", "label": "Prayer Area:", "opts": ["Yes", "No"], "extra": null, "short": "Prayer Area", "grid": false, "sec": "ops"}, "op_notes": {"type": "text", "key": "op_notes", "label": "Notes:", "short": "Operations Notes", "ml": true, "sec": "ops"}, "op_seating": {"type": "choice", "key": "op_seating", "label": "PREFERRED TYPES OF SEATING", "opts": ["High Tables", "Train Sofa", "Enclosed Sofa", "Communal Table", "Snake Shaped Table", "Counters", "Self-Lit High Tables", "Homey", "Cubicles (Nooks)", "Window Seating Sofa", "Small Round Tables", "Tree Bench Seating", "Small Chairs", "Fixed Stepping Bench"], "extra": null, "short": "Preferred Seating Types", "grid": true, "sec": "ops"}, "op_chairs": {"type": "text", "key": "op_chairs", "label": "Chair Types - materials / styles / references:", "short": "Chair Types", "ml": true, "sec": "ops"}, "qa_hand": {"type": "text", "key": "qa_hand", "label": "Number of Handwashing Stations:", "short": "Handwashing Stations", "ml": false, "sec": "qa"}, "qa_food": {"type": "text", "key": "qa_food", "label": "Food Safety Compliance Requirements:", "short": "Food Safety Compliance", "ml": true, "sec": "qa"}, "qa_filter": {"type": "choice", "key": "qa_filter", "label": "Water Filtration System Required:", "opts": ["Yes", "No"], "extra": null, "short": "Water Filtration System", "grid": false, "sec": "qa"}, "qa_wtest": {"type": "choice", "key": "qa_wtest", "label": "Water Quality Testing Point Required:", "opts": ["Yes", "No"], "extra": null, "short": "Water Quality Testing Point", "grid": false, "sec": "qa"}, "qa_temp": {"type": "choice", "key": "qa_temp", "label": "Temperature Monitoring (fridges / freezers):", "opts": ["Yes", "No"], "extra": null, "short": "Temperature Monitoring", "grid": false, "sec": "qa"}, "qa_waste": {"type": "choice", "key": "qa_waste", "label": "Waste Segregation Area:", "opts": ["Yes", "No"], "extra": null, "short": "Waste Segregation Area", "grid": false, "sec": "qa"}, "qa_disposal": {"type": "choice", "key": "qa_disposal", "label": "Waste Disposal Area:", "opts": ["Yes", "No"], "extra": null, "short": "Waste Disposal Area", "grid": false, "sec": "qa"}, "qa_chem": {"type": "choice", "key": "qa_chem", "label": "Cleaning / Chemical Storage Area:", "opts": ["Yes", "No"], "extra": null, "short": "Cleaning / Chemical Storage", "grid": false, "sec": "qa"}, "qa_cleaneq": {"type": "choice", "key": "qa_cleaneq", "label": "Cleaning Equipment Storage:", "opts": ["Yes", "No"], "extra": null, "short": "Cleaning Equipment Storage", "grid": false, "sec": "qa"}, "qa_pest": {"type": "choice", "key": "qa_pest", "label": "Pest Control Access Points:", "opts": ["Yes", "No"], "extra": null, "short": "Pest Control Access Points", "grid": false, "sec": "qa"}, "qa_fly": {"type": "text", "key": "qa_fly", "label": "Fly Traps Requirements:", "short": "Fly Traps", "ml": true, "sec": "qa"}, "qa_health": {"type": "text", "key": "qa_health", "label": "Health Authority Approvals Required:", "short": "Health Authority Approvals", "ml": true, "sec": "qa"}, "qa_hsign": {"type": "text", "key": "qa_hsign", "label": "Hygiene Signage Requirements:", "short": "Hygiene Signage", "ml": true, "sec": "qa"}, "qa_extra": {"type": "text", "key": "qa_extra", "label": "Other Quality Requirements (not in the standard list below):", "short": "Other Quality Requirements", "ml": true, "sec": "qa"}, "qa_notes": {"type": "text", "key": "qa_notes", "label": "Notes:", "short": "Quality Notes", "ml": true, "sec": "qa"}, "fm_tank": {"type": "choice", "key": "fm_tank", "label": "Water Tank / Pump Required:", "opts": ["Yes", "No"], "extra": null, "short": "Water Tank / Pump", "grid": false, "sec": "fm"}, "fm_grease": {"type": "choice", "key": "fm_grease", "label": "Grease Trap Required:", "opts": ["Yes", "No"], "extra": null, "short": "Grease Trap", "grid": false, "sec": "fm"}, "fm_alarm": {"type": "choice", "key": "fm_alarm", "label": "Security Alarm System Required:", "opts": ["Yes", "No"], "extra": null, "short": "Security Alarm System", "grid": false, "sec": "fm"}, "fm_access": {"type": "choice", "key": "fm_access", "label": "Access Control (for toilets):", "opts": ["Yes", "No"], "extra": null, "short": "Access Control (toilets)", "grid": false, "sec": "fm"}, "fm_pm": {"type": "text", "key": "fm_pm", "label": "Preventive Maintenance Access Notes (e.g. access to HVAC units):", "short": "Maintenance Access (HVAC / plant)", "ml": true, "sec": "fm"}, "fm_notes": {"type": "text", "key": "fm_notes", "label": "Notes:", "short": "Facility Notes", "ml": true, "sec": "fm"}, "it_sound": {"type": "choice", "key": "it_sound", "label": "Sound System Required:", "opts": ["Yes", "No"], "extra": ["it_sound_zones", "Zones / notes"], "short": "Sound System", "grid": false, "sec": "it"}, "it_cctv": {"type": "choice", "key": "it_cctv", "label": "CCTV System Required:", "opts": ["Yes", "No"], "extra": ["it_cctv_no", "Number of cameras"], "short": "CCTV System", "grid": false, "sec": "it"}, "it_data": {"type": "text", "key": "it_data", "label": "Number of Data Network Points:", "short": "Data Network Points", "ml": false, "sec": "it"}, "it_net": {"type": "text", "key": "it_net", "label": "Internet Provider / Line Type Requirements:", "short": "Internet Provider / Line Type", "ml": true, "sec": "it"}, "it_gsm": {"type": "choice", "key": "it_gsm", "label": "GSM Signal Coverage:", "opts": ["Good", "Weak - Booster Needed", "To Be Surveyed"], "extra": null, "short": "GSM Signal Coverage", "grid": false, "sec": "it"}, "it_wifi": {"type": "choice", "key": "it_wifi", "label": "Guest WiFi Required:", "opts": ["Yes", "No"], "extra": null, "short": "Guest WiFi", "grid": false, "sec": "it"}, "it_rack": {"type": "text", "key": "it_rack", "label": "Server / IT Rack Location:", "short": "Server / IT Rack Location", "ml": false, "sec": "it"}, "it_notes": {"type": "text", "key": "it_notes", "label": "Notes:", "short": "IT Notes", "ml": true, "sec": "it"}, "lg_special": {"type": "text", "key": "lg_special", "label": "Contract Special Conditions:", "short": "Contract Special Conditions", "ml": true, "sec": "legal"}, "lg_trade": {"type": "choice", "key": "lg_trade", "label": "Trade License Status:", "opts": ["Issued", "In Progress", "Not Started", "N/A"], "extra": null, "short": "Trade License Status", "grid": false, "sec": "legal"}, "lg_permit": {"type": "choice", "key": "lg_permit", "label": "Fit-out Permit Status:", "opts": ["Issued", "In Progress", "Not Started", "N/A"], "extra": null, "short": "Fit-out Permit Status", "grid": false, "sec": "legal"}, "lg_cd": {"type": "choice", "key": "lg_cd", "label": "Civil Defense Approval Required:", "opts": ["Yes", "No"], "extra": ["lg_cd_req", "Special requirements"], "short": "Civil Defense Approval", "grid": false, "sec": "legal"}, "lg_meter": {"type": "choice", "key": "lg_meter", "label": "Utility Metering:", "opts": ["Separate Meters", "Shared with Landlord", "Not Sure"], "extra": null, "short": "Utility Metering", "grid": false, "sec": "legal"}, "lg_signpermit": {"type": "choice", "key": "lg_signpermit", "label": "Signage / Advertising Permit Required:", "opts": ["Yes", "No"], "extra": null, "short": "Signage / Advertising Permit", "grid": false, "sec": "legal"}, "lg_music": {"type": "choice", "key": "lg_music", "label": "Music / Performance License Required:", "opts": ["Yes", "No"], "extra": null, "short": "Music / Performance License", "grid": false, "sec": "legal"}, "lg_outdoor": {"type": "choice", "key": "lg_outdoor", "label": "Outdoor Seating Permit Required:", "opts": ["Yes", "No"], "extra": null, "short": "Outdoor Seating Permit", "grid": false, "sec": "legal"}, "lg_ins": {"type": "text", "key": "lg_ins", "label": "Insurance Requirements:", "short": "Insurance Requirements", "ml": true, "sec": "legal"}, "lg_affect": {"type": "choice", "key": "lg_affect", "label": "Permits Affecting Design or Fit-Out:", "opts": ["Yes", "No"], "extra": ["lg_affect_det", "If yes - specify"], "short": "Permits Affecting Design / Fit-Out", "grid": false, "sec": "legal"}, "lg_notes": {"type": "text", "key": "lg_notes", "label": "Notes:", "short": "Legal Notes", "ml": true, "sec": "legal"}, "qr01": {"type": "req", "key": "qr01", "en": "Entrance doors must be equipped with effective air curtains aligned with the door height.", "ar": "يجب أن تكون أبواب المداخل مزودة بستائر هوائية فعّالة تتناسب مع ارتفاع الباب وتكون بمحاذاته مباشرة.", "to": "AB", "sec": "qa", "short": "Entrance doors must be equipped with effective air curtains aligned with the door height.", "on": true}, "qr02": {"type": "req", "key": "qr02", "en": "Entrance doors must have self-closing mechanisms to prevent full opening.", "ar": "يجب أن تكون أبواب المداخل مزودة بآليات إغلاق ذاتي لمنع فتح الباب بشكل كامل.", "to": "A", "sec": "qa", "short": "Entrance doors must have self-closing mechanisms to prevent full opening.", "on": true}, "qr03": {"type": "req", "key": "qr03", "en": "Doors and windows must be well sealed to prevent the entry of rodents, pests, or stray animals, and door bottom seals must be installed.", "ar": "يجب أن تكون الأبواب والنوافذ محكمة الإغلاق لمنع دخول القوارض أو الآفات أو الحيوانات الضالة، مع توفير سدّات سفلية للأبواب.", "to": "A", "sec": "qa", "short": "Doors and windows must be well sealed to prevent the entry of rodents, pests, or stray animals, and door bottom seals must be installed.", "on": true}, "qr04": {"type": "req", "key": "qr04", "en": "The site level must be higher than street level to prevent wastewater backflow, or a mechanism must be provided to prevent this.", "ar": "يجب أن يكون منسوب الموقع أعلى من منسوب الشارع لضمان عدم رجوع مياه الصرف، أو توفير آلية تصريف تمنع ذلك.", "to": "AB", "sec": "qa", "short": "The site level must be higher than street level to prevent wastewater backflow, or a mechanism must be provided to prevent this.", "on": true}, "qr05": {"type": "req", "key": "qr05", "en": "Wall-to-floor joints in counter areas, storage areas, and any room with drainage must be concave to prevent dirt accumulation.", "ar": "يجب أن تكون الوصلات بين الجدران والأرضيات ذات شكل مقعّر لمنع تراكم الأوساخ والملوثات في مناطق الكاونتر والتخزين وأي غرفة تحتوي على نقطة تصريف.", "to": "A", "sec": "qa", "short": "Wall-to-floor joints in counter areas, storage areas, and any room with drainage must be concave to prevent dirt accumulation.", "on": true}, "qr06": {"type": "req", "key": "qr06", "en": "All drainage points must have internal sieves, proper covers, non-return valves, and must be easily accessible for cleaning and maintenance.", "ar": "يجب أن تحتوي جميع نقاط الصرف على غرابيل داخلية وأغطية مناسبة وصمامات عدم الرجوع مع سهولة الوصول إليها لأعمال التنظيف والصيانة.", "to": "B", "sec": "qa", "short": "All drainage points must have internal sieves, proper covers, non-return valves, and must be easily accessible for cleaning and maintenance.", "on": true}, "qr07": {"type": "req", "key": "qr07", "en": "Walls in enclosed areas must be well sealed to prevent entry of pests.", "ar": "يجب أن تكون الجدران في المناطق المغلقة محكمة العزل لمنع دخول الآفات.", "to": "A", "sec": "qa", "short": "Walls in enclosed areas must be well sealed to prevent entry of pests.", "on": true}, "qr08": {"type": "req", "key": "qr08", "en": "All openings in walls, drains, and around pipes must be sealed to prevent entry of insects or rodents.", "ar": "يجب سد جميع الفتحات في الجدران أو حول المصارف والمواسير لمنع دخول الحشرات والقوارض.", "to": "AB", "sec": "qa", "short": "All openings in walls, drains, and around pipes must be sealed to prevent entry of insects or rodents.", "on": true}, "qr09": {"type": "req", "key": "qr09", "en": "A hand-washing sink with hot water must be available at the counter area.", "ar": "يجب توفير مغسلة لغسيل الأيدي في منطقة الكاونتر مزودة بماء ساخن.", "to": "AB", "sec": "qa", "short": "A hand-washing sink with hot water must be available at the counter area.", "on": true}, "qr10": {"type": "req", "key": "qr10", "en": "Hand-washing sinks in bathrooms must include soap, sanitizer, paper towels, automatic-closing trash bins, and hot water (≥38°C).", "ar": "يجب توفير مغسلة أيدي في الحمامات مع صابون ومعقم ومناديل وسلة نفايات بإغلاق تلقائي وماء ساخن بدرجة لا تقل عن 38°C.", "to": "AB", "sec": "qa", "short": "Hand-washing sinks in bathrooms must include soap, sanitizer, paper towels, automatic-closing trash bins, and hot water (≥38°C).", "on": true}, "qr11": {"type": "req", "key": "qr11", "en": "A dedicated sink must be provided for cleaning hygiene tools, with enough space to store cleaning equipment. One combined sink may serve both purposes if adequate.", "ar": "يجب توفير حوض مخصص لغسيل أدوات النظافة وبمساحة كافية لحفظ أدوات التنظيف، ويمكن أن يكون حوضًا واحدًا يخدم الغرضين.", "to": "AB", "sec": "qa", "short": "A dedicated sink must be provided for cleaning hygiene tools, with enough space to store cleaning equipment. One combined sink may serve both purposes if adequate.", "on": true}, "qr12": {"type": "req", "key": "qr12", "en": "Water heaters must be installed in all branches.", "ar": "يجب تركيب سخان مياه في جميع الفروع.", "to": "B", "sec": "qa", "short": "Water heaters must be installed in all branches.", "on": true}, "qr13": {"type": "req", "key": "qr13", "en": "Water filters must be installed on all water sources inside the branch.", "ar": "يجب تركيب فلاتر مياه على جميع مصادر المياه داخل الفرع.", "to": "B", "sec": "qa", "short": "Water filters must be installed on all water sources inside the branch.", "on": true}, "qr14": {"type": "req", "key": "qr14", "en": "Air conditioners must maintain internal temperature at a maximum of 25°C, especially near open display fridges.", "ar": "يجب أن تحافظ أجهزة التكييف على درجة حرارة لا تتجاوز 25°C خصوصًا قرب ثلاجات العرض المفتوحة.", "to": "B", "sec": "qa", "short": "Air conditioners must maintain internal temperature at a maximum of 25°C, especially near open display fridges.", "on": true}, "qr15": {"type": "req", "key": "qr15", "en": "Storage areas must be well ventilated with temperature maintained below 28°C.", "ar": "يجب أن تكون مناطق التخزين جيدة التهوية مع الحفاظ على درجة حرارة أقل من 28°C.", "to": "B", "sec": "qa", "short": "Storage areas must be well ventilated with temperature maintained below 28°C.", "on": true}, "qr16": {"type": "req", "key": "qr16", "en": "Adequate ventilation space must be provided around display fridges, closed fridges, and freezers.", "ar": "يجب توفير مساحة تهوية مناسبة حول ثلاجات العرض والثلاجات المغلقة والفريزرات لضمان عملها بشكل صحيح.", "to": "A", "sec": "qa", "short": "Adequate ventilation space must be provided around display fridges, closed fridges, and freezers.", "on": true}, "qr17": {"type": "req", "key": "qr17", "en": "Open display fridges must not be exposed to direct sunlight.", "ar": "يجب عدم تعريض ثلاجات العرض المفتوحة لأشعة الشمس المباشرة.", "to": "A", "sec": "qa", "short": "Open display fridges must not be exposed to direct sunlight.", "on": true}, "qr18": {"type": "req", "key": "qr18", "en": "Electrical outlets for fly traps must be installed at a height of 170 cm, with locations determined by the Quality team and pest control provider.", "ar": "يجب تركيب مقابس كهرباء على ارتفاع 170 سم لتشغيل مصائد الذباب، ويتم تحديد مواقعها من قبل فريق الجودة وشركة مكافحة الآفات.", "to": "B", "sec": "qa", "short": "Electrical outlets for fly traps must be installed at a height of 170 cm, with locations determined by the Quality team and pest control provider.", "on": true}, "qr19": {"type": "req", "key": "qr19", "en": "All electrical panels and sockets must be covered.", "ar": "يجب تغطية جميع اللوحات الكهربائية والمقابس.", "to": "B", "sec": "qa", "short": "All electrical panels and sockets must be covered.", "on": true}, "qr20": {"type": "req", "key": "qr20", "en": "A clearance of at least 5 cm must be provided around any machine installed within or under the counter.", "ar": "يجب توفير فراغ لا يقل عن 5 سم حول أي آلة مركّبة داخل أو أسفل الكاونتر لتسهيل التنظيف والصيانة.", "to": "A", "sec": "qa", "short": "A clearance of at least 5 cm must be provided around any machine installed within or under the counter.", "on": true}, "qr21": {"type": "req", "key": "qr21", "en": "Corners and spaces beneath cabinets must be easily accessible for cleaning.", "ar": "يجب أن تكون زوايا الموقع وما تحت الخزائن سهلة الوصول للتنظيف.", "to": "A", "sec": "qa", "short": "Corners and spaces beneath cabinets must be easily accessible for cleaning.", "on": true}, "qr22": {"type": "req", "key": "qr22", "en": "A designated staff room with lockers for personal belongings (and eating area if possible) must be provided.", "ar": "يجب توفير غرفة مخصصة للموظفين تحتوي على خزائن لحفظ الأغراض الشخصية (ومكان للأكل إن أمكن).", "to": "A", "sec": "qa", "short": "A designated staff room with lockers for personal belongings (and eating area if possible) must be provided.", "on": true}, "qr23": {"type": "req", "key": "qr23", "en": "A designated cabinet for storing cleaning chemicals and tools must be provided, away from food and beverages.", "ar": "يجب توفير خزانة مخصصة لحفظ أدوات ومواد التنظيف بعيدًا عن الأغذية والمشروبات.", "to": "A", "sec": "qa", "short": "A designated cabinet for storing cleaning chemicals and tools must be provided, away from food and beverages.", "on": true}, "qr24": {"type": "req", "key": "qr24", "en": "A first aid kit must be available for minor injuries.", "ar": "يجب توفير صندوق إسعافات أولية لمعالجة الإصابات البسيطة.", "to": "A", "sec": "qa", "short": "A first aid kit must be available for minor injuries.", "on": true}, "qr25": {"type": "req", "key": "qr25", "en": "Bathrooms must not open directly into food storage, preparation, handling, or service areas, nor into packaging areas.", "ar": "يجب ألا تُفتح الحمامات مباشرة على مناطق التخزين أو التحضير أو المناولة أو تقديم الأغذية والمشروبات أو مواد التغليف.", "to": "A", "sec": "qa", "short": "Bathrooms must not open directly into food storage, preparation, handling, or service areas, nor into packaging areas.", "on": true}, "qr26": {"type": "req", "key": "qr26", "en": "The smoking area must be fully isolated from the counter to prevent product contamination.", "ar": "يجب أن تكون منطقة التدخين معزولة بالكامل عن منطقة الكاونتر لمنع تلوث المنتجات بالدخان.", "to": "A", "sec": "qa", "short": "The smoking area must be fully isolated from the counter to prevent product contamination.", "on": true}, "qr27": {"type": "req", "key": "qr27", "en": "Food trucks must have fully enclosed front facades, with dedicated windows for payment and order delivery, and air curtains or plastic curtains must be installed when windows are open.", "ar": "يجب إغلاق واجهات عربات الطعام المتنقلة بالكامل وتخصيص شباك للدفع وشباك للتسليم مع تركيب ستائر هواء أو ستائر بلاستيكية عند فتحها.", "to": "AB", "sec": "qa", "short": "Food trucks must have fully enclosed front facades, with dedicated windows for payment and order delivery, and air curtains or plastic curtains must be installed when windows are open.", "on": false}, "qr28": {"type": "req", "key": "qr28", "en": "Metal mesh screens must be installed on exhaust fans to prevent the entry of insects or rodents.", "ar": "تركيب شبك معدني على الشفاطات لمنع دخول الحشرات أو القوارض.", "to": "B", "sec": "qa", "short": "Metal mesh screens must be installed on exhaust fans to prevent the entry of insects or rodents.", "on": true}, "qr29": {"type": "req", "key": "qr29", "en": "A splash guard must be installed on the hand-washing sink to isolate it from the rest of the counter area and equipment.", "ar": "تركيب حاجز رذاذ (Splash Guard) على حوض غسيل الأيدي لعزله عن باقي منطقة الكاونتر والمعدات.", "to": "A", "sec": "qa", "short": "A splash guard must be installed on the hand-washing sink to isolate it from the rest of the counter area and equipment.", "on": true}, "qr30": {"type": "req", "key": "qr30", "en": "Sufficient foot-pedal operated waste bins must be provided in the branch.", "ar": "توفير أماكن كافية للمخلفات في الفرع تعمل بنظام الفتح بالقدم.", "to": "A", "sec": "qa", "short": "Sufficient foot-pedal operated waste bins must be provided in the branch.", "on": true}, "mn_roci": {"type": "choice", "key": "mn_roci", "label": "Equipment List (ROCI) Attached", "opts": ["Yes", "No"], "extra": null, "short": "Equipment List (ROCI) Attached", "grid": false, "sec": "manual"}}, "A": [["Project", ["br_name", "br_code", "br_location", "br_type", "br_cat", "br_open"]], ["Space & Site", ["ls_sector", "ls_in", "ls_out", "ls_tot", "en_act_in", "en_act_out", "ls_floors", "ls_perfloor", "ls_handover", "ls_facade", "ls_facade_len", "ls_sign", "ls_sign_restr", "ls_dt", "ls_deliv", "ls_guide", "en_struct", "en_mezz"]], ["Brand & Look", ["mk_concept", "mk_customer", "mk_extsign", "mk_logo", "mk_wall", "mk_window", "mk_insta", "mk_season", "mk_promo", "mk_retail", "mk_menu", "mk_screens"]], ["Seating & Front of House", ["op_seat_in", "op_seat_out", "op_smoke", "op_nosmoke", "op_seating", "op_chairs", "op_counter", "op_queue", "op_pos", "op_dtw", "op_rider", "op_pickup"]], ["Back of House", ["op_staff", "op_kitchen", "op_store_in", "op_store_area", "op_lockers", "op_stafftoilet", "op_guesttoilet", "op_prayer", "qa_hand", "qa_waste", "qa_disposal", "qa_chem", "qa_cleaneq", "it_rack"]], ["Permits Affecting Design", ["lg_signpermit", "lg_outdoor", "lg_affect"]], ["Quality Standard Requirements  (☑ = required for this branch)", ["qr01", "qr02", "qr03", "qr04", "qr05", "qr07", "qr08", "qr09", "qr10", "qr11", "qr16", "qr17", "qr20", "qr21", "qr22", "qr23", "qr24", "qr25", "qr26", "qr27", "qr29", "qr30", "qa_extra"]]], "B": [["Electrical", ["en_load", "en_supply", "en_gen", "lg_meter"]], ["Water, Drainage & Gas", ["en_water", "en_drain", "en_gas", "fm_tank", "fm_grease", "qa_filter", "qa_wtest"]], ["HVAC", ["en_hvac", "en_hvac_tr", "en_fresh", "fm_pm"]], ["Fire & Life Safety", ["en_ff", "en_fa", "lg_cd"]], ["Tie-ins & Loads Basis", ["en_tiein", "op_kitchen", "mn_roci", "op_store_area", "op_staff", "op_seat_in", "op_seat_out"]], ["Quality Points", ["qa_hand", "qa_temp", "qa_pest", "qa_fly"]], ["Low Current / IT & Security", ["it_sound", "it_cctv", "it_data", "it_net", "it_gsm", "it_wifi", "op_pos", "mk_screens", "it_rack", "fm_alarm", "fm_access"]], ["Quality Standard Requirements  (☑ = required for this branch)", ["qr01", "qr04", "qr06", "qr08", "qr09", "qr10", "qr11", "qr12", "qr13", "qr14", "qr15", "qr18", "qr19", "qr27", "qr28", "qa_extra"]]], "qa_reqs": ["qr01", "qr02", "qr03", "qr04", "qr05", "qr06", "qr07", "qr08", "qr09", "qr10", "qr11", "qr12", "qr13", "qr14", "qr15", "qr16", "qr17", "qr18", "qr19", "qr20", "qr21", "qr22", "qr23", "qr24", "qr25", "qr26", "qr27", "qr28", "qr29", "qr30"], "colors": {"branch": "2F1C13", "leasing": "4A2F22", "eng": "5A4A3A", "mkt": "7A5540", "ops": "5F7D47", "qa": "4F6B57", "fm": "6B5B4E", "it": "3F5666", "legal": "6A4A5A", "sign": "4A2F22", "A": "7A5540", "B": "3F5666", "manual": "8A6D3B"}, "src": {"branch": "Branch Info", "leasing": "Leasing", "eng": "Engineering", "mkt": "Marketing", "ops": "Operations", "qa": "Quality", "fm": "Facility", "it": "IT", "legal": "Legal", "manual": "Enter here"}, "seat_svgs": {"High Tables": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"High Tables\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"73.0\" y=\"52\" width=\"54\" height=\"6\" rx=\"1.5\" fill=\"#A0714F\"/><rect x=\"98\" y=\"58\" width=\"4\" height=\"58\" fill=\"#4A2F22\"/><ellipse cx=\"100\" cy=\"117\" rx=\"16\" ry=\"2.5\" fill=\"#4A2F22\"/><rect x=\"47\" y=\"72\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"51\" y1=\"78\" x2=\"49\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"65\" y1=\"78\" x2=\"67\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"50\" y1=\"99.6\" x2=\"66\" y2=\"99.6\" stroke=\"#6B5B4E\" stroke-width=\"2\"/><rect x=\"131\" y=\"72\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"135\" y1=\"78\" x2=\"133\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"149\" y1=\"78\" x2=\"151\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"134\" y1=\"99.6\" x2=\"150\" y2=\"99.6\" stroke=\"#6B5B4E\" stroke-width=\"2\"/></svg>", "Train Sofa": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Train Sofa\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"22\" y=\"44\" width=\"10\" height=\"74\" rx=\"4\" fill=\"#5F7D47\"/><rect x=\"22\" y=\"86\" width=\"48\" height=\"32\" rx=\"3\" fill=\"#5F7D47\"/><rect x=\"24\" y=\"82\" width=\"44\" height=\"8\" rx=\"4\" fill=\"#7C9A63\"/><rect x=\"168\" y=\"44\" width=\"10\" height=\"74\" rx=\"4\" fill=\"#5F7D47\"/><rect x=\"130\" y=\"86\" width=\"48\" height=\"32\" rx=\"3\" fill=\"#5F7D47\"/><rect x=\"132\" y=\"82\" width=\"44\" height=\"8\" rx=\"4\" fill=\"#7C9A63\"/><rect x=\"72.0\" y=\"74\" width=\"56\" height=\"6\" rx=\"1.5\" fill=\"#A0714F\"/><rect x=\"98\" y=\"80\" width=\"4\" height=\"36\" fill=\"#4A2F22\"/><ellipse cx=\"100\" cy=\"117\" rx=\"16\" ry=\"2.5\" fill=\"#4A2F22\"/></svg>", "Enclosed Sofa": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Enclosed Sofa\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M28 118 V52 Q28 30 50 30 H150 Q172 30 172 52 V118 Z\" fill=\"#5F7D47\"/><path d=\"M40 118 V58 Q40 42 56 42 H144 Q160 42 160 58 V118 Z\" fill=\"#7C9A63\"/><rect x=\"40\" y=\"84\" width=\"120\" height=\"34\" fill=\"#5F7D47\"/><rect x=\"74.0\" y=\"78\" width=\"52\" height=\"6\" rx=\"1.5\" fill=\"#A0714F\"/><rect x=\"98\" y=\"84\" width=\"4\" height=\"32\" fill=\"#4A2F22\"/><ellipse cx=\"100\" cy=\"117\" rx=\"16\" ry=\"2.5\" fill=\"#4A2F22\"/></svg>", "Communal Table": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Communal Table\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"14\" y=\"66\" width=\"172\" height=\"7\" rx=\"2\" fill=\"#A0714F\"/><rect x=\"26\" y=\"73\" width=\"5\" height=\"45\" fill=\"#4A2F22\"/><rect x=\"169\" y=\"73\" width=\"5\" height=\"45\" fill=\"#4A2F22\"/><rect x=\"38\" y=\"50\" width=\"20\" height=\"30\" rx=\"5\" fill=\"#5F7D47\"/><rect x=\"36\" y=\"86\" width=\"24\" height=\"5\" rx=\"2\" fill=\"#7C9A63\"/><line x1=\"40\" y1=\"91\" x2=\"39\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"56\" y1=\"91\" x2=\"57\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><rect x=\"68\" y=\"50\" width=\"20\" height=\"30\" rx=\"5\" fill=\"#5F7D47\"/><rect x=\"66\" y=\"86\" width=\"24\" height=\"5\" rx=\"2\" fill=\"#7C9A63\"/><line x1=\"70\" y1=\"91\" x2=\"69\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"86\" y1=\"91\" x2=\"87\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><rect x=\"98\" y=\"50\" width=\"20\" height=\"30\" rx=\"5\" fill=\"#5F7D47\"/><rect x=\"96\" y=\"86\" width=\"24\" height=\"5\" rx=\"2\" fill=\"#7C9A63\"/><line x1=\"100\" y1=\"91\" x2=\"99\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"116\" y1=\"91\" x2=\"117\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><rect x=\"128\" y=\"50\" width=\"20\" height=\"30\" rx=\"5\" fill=\"#5F7D47\"/><rect x=\"126\" y=\"86\" width=\"24\" height=\"5\" rx=\"2\" fill=\"#7C9A63\"/><line x1=\"130\" y1=\"91\" x2=\"129\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"146\" y1=\"91\" x2=\"147\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/></svg>", "Snake Shaped Table": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Snake Shaped Table\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><path d=\"M20 95 C55 20, 85 20, 100 65 S145 110, 180 35\" fill=\"none\" stroke=\"#A0714F\" stroke-width=\"20\" stroke-linecap=\"round\"/><path d=\"M20 95 C55 20, 85 20, 100 65 S145 110, 180 35\" fill=\"none\" stroke=\"#B98A66\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".7\"/><circle cx=\"24\" cy=\"72\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"48\" cy=\"44\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"78\" cy=\"38\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"92\" cy=\"88\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"118\" cy=\"102\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"150\" cy=\"88\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"168\" cy=\"58\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"58\" cy=\"78\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"122\" cy=\"64\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"156\" cy=\"30\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"36\" cy=\"108\" r=\"6\" fill=\"#5F7D47\"/><circle cx=\"84\" cy=\"60\" r=\"6\" fill=\"#5F7D47\"/><text x=\"186\" y=\"124\" text-anchor=\"end\" font-family=\"Arial\" font-size=\"9\" fill=\"#6B5B4E\">top view</text></svg>", "Counters": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Counters\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"170\" y=\"14\" width=\"18\" height=\"104\" fill=\"#E8DFD3\"/><rect x=\"22\" y=\"56\" width=\"152\" height=\"7\" rx=\"1.5\" fill=\"#A0714F\"/><rect x=\"164\" y=\"63\" width=\"6\" height=\"55\" fill=\"#4A2F22\"/><rect x=\"26\" y=\"63\" width=\"4\" height=\"55\" fill=\"#4A2F22\"/><rect x=\"49\" y=\"76\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"53\" y1=\"82\" x2=\"51\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"67\" y1=\"82\" x2=\"69\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"52\" y1=\"101.2\" x2=\"68\" y2=\"101.2\" stroke=\"#6B5B4E\" stroke-width=\"2\"/><rect x=\"89\" y=\"76\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"93\" y1=\"82\" x2=\"91\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"107\" y1=\"82\" x2=\"109\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"92\" y1=\"101.2\" x2=\"108\" y2=\"101.2\" stroke=\"#6B5B4E\" stroke-width=\"2\"/><rect x=\"129\" y=\"76\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"133\" y1=\"82\" x2=\"131\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"147\" y1=\"82\" x2=\"149\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"132\" y1=\"101.2\" x2=\"148\" y2=\"101.2\" stroke=\"#6B5B4E\" stroke-width=\"2\"/></svg>", "Self-Lit High Tables": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Self-Lit High Tables\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><ellipse cx=\"100\" cy=\"60\" rx=\"40\" ry=\"14\" fill=\"#F2C94C\" opacity=\".35\"/><rect x=\"73.0\" y=\"52\" width=\"54\" height=\"6\" rx=\"1.5\" fill=\"#A0714F\"/><rect x=\"98\" y=\"58\" width=\"4\" height=\"58\" fill=\"#4A2F22\"/><ellipse cx=\"100\" cy=\"117\" rx=\"16\" ry=\"2.5\" fill=\"#4A2F22\"/><rect x=\"75\" y=\"58\" width=\"50\" height=\"3\" rx=\"1.5\" fill=\"#F2C94C\"/><rect x=\"47\" y=\"72\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"51\" y1=\"78\" x2=\"49\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"65\" y1=\"78\" x2=\"67\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"50\" y1=\"99.6\" x2=\"66\" y2=\"99.6\" stroke=\"#6B5B4E\" stroke-width=\"2\"/><rect x=\"131\" y=\"72\" width=\"22\" height=\"6\" rx=\"3\" fill=\"#5F7D47\"/><line x1=\"135\" y1=\"78\" x2=\"133\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"149\" y1=\"78\" x2=\"151\" y2=\"118\" stroke=\"#6B5B4E\" stroke-width=\"2.5\"/><line x1=\"134\" y1=\"99.6\" x2=\"150\" y2=\"99.6\" stroke=\"#6B5B4E\" stroke-width=\"2\"/></svg>", "Homey": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Homey\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><ellipse cx=\"96\" cy=\"118\" rx=\"80\" ry=\"5\" fill=\"#E3D3BF\"/><rect x=\"34\" y=\"52\" width=\"66\" height=\"44\" rx=\"12\" fill=\"#5F7D47\"/><rect x=\"28\" y=\"76\" width=\"16\" height=\"36\" rx=\"7\" fill=\"#7C9A63\"/><rect x=\"90\" y=\"76\" width=\"16\" height=\"36\" rx=\"7\" fill=\"#7C9A63\"/><rect x=\"42\" y=\"86\" width=\"50\" height=\"20\" rx=\"6\" fill=\"#7C9A63\"/><line x1=\"40\" y1=\"112\" x2=\"40\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"3\"/><line x1=\"94\" y1=\"112\" x2=\"94\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"3\"/><rect x=\"115.0\" y=\"88\" width=\"26\" height=\"6\" rx=\"3\" fill=\"#A0714F\"/><rect x=\"126\" y=\"94\" width=\"4\" height=\"22\" fill=\"#4A2F22\"/><ellipse cx=\"128\" cy=\"117\" rx=\"8.666666666666666\" ry=\"2.5\" fill=\"#4A2F22\"/><line x1=\"166\" y1=\"30\" x2=\"166\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><path d=\"M152 34 L180 34 L172 16 L160 16 Z\" fill=\"#F2C94C\"/><ellipse cx=\"166\" cy=\"118\" rx=\"10\" ry=\"2.5\" fill=\"#4A2F22\"/></svg>", "Cubicles (Nooks)": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Cubicles (Nooks)\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><rect x=\"10\" y=\"10\" width=\"180\" height=\"108\" fill=\"#E8DFD3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M22 118 V48 Q22 22 58 22 Q94 22 94 48 V118 Z\" fill=\"#D8CBBB\"/><rect x=\"28\" y=\"88\" width=\"60\" height=\"30\" rx=\"3\" fill=\"#5F7D47\"/><rect x=\"30\" y=\"84\" width=\"56\" height=\"8\" rx=\"4\" fill=\"#7C9A63\"/><rect x=\"32\" y=\"62\" width=\"16\" height=\"22\" rx=\"5\" fill=\"#7C9A63\"/><path d=\"M106 118 V48 Q106 22 142 22 Q178 22 178 48 V118 Z\" fill=\"#D8CBBB\"/><rect x=\"112\" y=\"88\" width=\"60\" height=\"30\" rx=\"3\" fill=\"#5F7D47\"/><rect x=\"114\" y=\"84\" width=\"56\" height=\"8\" rx=\"4\" fill=\"#7C9A63\"/><rect x=\"116\" y=\"62\" width=\"16\" height=\"22\" rx=\"5\" fill=\"#7C9A63\"/></svg>", "Window Seating Sofa": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Window Seating Sofa\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><rect x=\"10\" y=\"10\" width=\"180\" height=\"108\" fill=\"#E8DFD3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"28\" y=\"18\" width=\"144\" height=\"56\" rx=\"3\" fill=\"#CFE3EE\" stroke=\"#4A2F22\" stroke-width=\"3\"/><line x1=\"76\" y1=\"18\" x2=\"76\" y2=\"74\" stroke=\"#4A2F22\" stroke-width=\"2\"/><line x1=\"124\" y1=\"18\" x2=\"124\" y2=\"74\" stroke=\"#4A2F22\" stroke-width=\"2\"/><rect x=\"20\" y=\"86\" width=\"160\" height=\"32\" rx=\"3\" fill=\"#5F7D47\"/><rect x=\"22\" y=\"80\" width=\"156\" height=\"10\" rx=\"5\" fill=\"#7C9A63\"/><rect x=\"36\" y=\"66\" width=\"28\" height=\"16\" rx=\"6\" fill=\"#B7C9A3\"/><rect x=\"84\" y=\"66\" width=\"28\" height=\"16\" rx=\"6\" fill=\"#B7C9A3\"/><rect x=\"132\" y=\"66\" width=\"28\" height=\"16\" rx=\"6\" fill=\"#B7C9A3\"/></svg>", "Small Round Tables": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Small Round Tables\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"82.0\" y=\"72\" width=\"36\" height=\"6\" rx=\"3\" fill=\"#A0714F\"/><rect x=\"98\" y=\"78\" width=\"4\" height=\"38\" fill=\"#4A2F22\"/><ellipse cx=\"100\" cy=\"117\" rx=\"12.0\" ry=\"2.5\" fill=\"#4A2F22\"/><rect x=\"51.0\" y=\"58\" width=\"4\" height=\"36\" rx=\"2\" fill=\"#4A2F22\"/><rect x=\"51.0\" y=\"88\" width=\"22\" height=\"6\" rx=\"2\" fill=\"#5F7D47\"/><line x1=\"54.0\" y1=\"94\" x2=\"53.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"70.0\" y1=\"94\" x2=\"71.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><rect x=\"145.0\" y=\"58\" width=\"4\" height=\"36\" rx=\"2\" fill=\"#4A2F22\"/><rect x=\"127.0\" y=\"88\" width=\"22\" height=\"6\" rx=\"2\" fill=\"#5F7D47\"/><line x1=\"130.0\" y1=\"94\" x2=\"129.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"146.0\" y1=\"94\" x2=\"147.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/></svg>", "Tree Bench Seating": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Tree Bench Seating\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"93\" y=\"44\" width=\"14\" height=\"74\" fill=\"#7A5540\"/><circle cx=\"100\" cy=\"36\" r=\"30\" fill=\"#6E9B4F\"/><circle cx=\"76\" cy=\"46\" r=\"18\" fill=\"#6E9B4F\"/><circle cx=\"124\" cy=\"46\" r=\"18\" fill=\"#6E9B4F\"/><path d=\"M36 90 H164 L158 118 H42 Z\" fill=\"#A0714F\"/><rect x=\"32\" y=\"84\" width=\"136\" height=\"8\" rx=\"3\" fill=\"#B98A66\"/><rect x=\"93\" y=\"84\" width=\"14\" height=\"8\" fill=\"#7A5540\"/></svg>", "Small Chairs": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Small Chairs\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"62.0\" y=\"64\" width=\"4\" height=\"32\" rx=\"2\" fill=\"#4A2F22\"/><rect x=\"62.0\" y=\"90\" width=\"20\" height=\"6\" rx=\"2\" fill=\"#5F7D47\"/><line x1=\"65.0\" y1=\"96\" x2=\"64.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"79.0\" y1=\"96\" x2=\"80.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><rect x=\"118.0\" y=\"64\" width=\"4\" height=\"32\" rx=\"2\" fill=\"#4A2F22\"/><rect x=\"118.0\" y=\"90\" width=\"20\" height=\"6\" rx=\"2\" fill=\"#5F7D47\"/><line x1=\"121.0\" y1=\"96\" x2=\"120.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/><line x1=\"135.0\" y1=\"96\" x2=\"136.0\" y2=\"118\" stroke=\"#4A2F22\" stroke-width=\"2.5\"/></svg>", "Fixed Stepping Bench": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 130\" role=\"img\" aria-label=\"Fixed Stepping Bench\"><rect width=\"200\" height=\"130\" rx=\"10\" fill=\"#FBF8F3\"/><line x1=\"8\" y1=\"118\" x2=\"192\" y2=\"118\" stroke=\"#CDBFAE\" stroke-width=\"2\" stroke-linecap=\"round\"/><rect x=\"20\" y=\"96\" width=\"160\" height=\"22\" fill=\"#A0714F\"/><rect x=\"28\" y=\"90\" width=\"34\" height=\"7\" rx=\"3.5\" fill=\"#7C9A63\"/><rect x=\"70\" y=\"76\" width=\"110\" height=\"42\" fill=\"#B98A66\"/><rect x=\"78\" y=\"70\" width=\"34\" height=\"7\" rx=\"3.5\" fill=\"#7C9A63\"/><rect x=\"120\" y=\"56\" width=\"60\" height=\"62\" fill=\"#A0714F\"/><rect x=\"128\" y=\"50\" width=\"34\" height=\"7\" rx=\"3.5\" fill=\"#7C9A63\"/></svg>"}};
+const PM_EMAIL = "mohamed.adel@rightspm.com";
+const MULTI = new Set(["en_hvac", "en_ff", "op_seating"]);
+const NAMES = {branch:"Branch Identification", leasing:"Leasing & Expansion", eng:"Engineering", mkt:"Marketing",
+  ops:"Operations", qa:"Quality", fm:"Facility & Maintenance", it:"IT", legal:"Legal"};
+const DEPTS = ["branch","leasing","eng","mkt","ops","qa","fm","it","legal"];
+// PM-only "Equipment List (ROCI)" row is filled in the Branch Identification section in this version
+SPEC.sections.find(s => s.code === "branch").fields.push("mn_roci");
+SPEC.fields.mn_roci.sec = "branch";
+SPEC.src.branch = "Branch Info / PM";
+
+let PRESET = null;
+const SRC_HTML = "<!doctype html>\n" + document.documentElement.outerHTML;
+const CAN_DOWNLOAD = !/claudeusercontent|claude\.ai/.test(location.host);
+const branchFileName = b => `Cilantro_Form_${slug(b || "Branch")}.html`;
+const $app = document.getElementById("app");
+const $status = document.getElementById("status");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => s.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "x";
+const F = k => SPEC.fields[k];
+const col = code => "#" + (SPEC.colors[code] || "4a2f22");
+const fmtDate = ms => ms ? new Date(ms).toLocaleString("en-GB", {day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "";
+function setStatus(text, err){ $status.hidden = !text; $status.textContent = text || ""; $status.className = "status noprint" + (err ? " err" : ""); }
+function getVal(values, key, f){ if (f && f.type === "req") return key in values ? !!values[key] : !!f.on; return values[key]; }
+
+/* ---------- local storage (this device only) ---------- */
+function load(key, dflt){ try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : dflt; } catch { return dflt; } }
+function save(key, v){ try { localStorage.setItem(key, JSON.stringify(v)); return true; } catch { return false; } }
+
+function widget(f){
+  const k = f.key;
+  if (f.type === "text"){
+    return f.ml ? `<textarea data-k="${k}" placeholder="Type here"></textarea>` : `<input type="text" data-k="${k}" placeholder="Type here">`;
+  }
+  if (f.type === "date") return `<input type="date" data-k="${k}">`;
+  if (f.type === "choice"){
+    let h = `<div class="opts" data-group="${k}">` + f.opts.map(o =>
+      `<label class="opt"><input type="checkbox" data-k="${k}_${slug(o)}" data-g="${k}"> ${esc(o)}</label>`).join("") + `</div>`;
+    if (f.extra) h += `<div class="extra">${esc(f.extra[1])}:<input type="text" data-k="${f.extra[0]}" placeholder="Type here"></div>`;
+    return h;
+  }
+  return "";
+}
+
+function renderSection(code, values){
+  const s = SPEC.sections.find(x => x.code === code);
+  const color = col(code);
+  let rows = "", grid = "", chairs = "";
+  for (const key of s.fields){
+    const f = F(key);
+    if (f.grid){
+      grid = `<div class="lab" style="border-top:1px solid var(--line)">${esc(f.label)} <span class="note" style="font-weight:400">– tick every type you want (pictures are for reference)</span></div><div class="grid seats">` + f.opts.map(o =>
+        `<label class="opt seatcard">${(SPEC.seat_svgs || {})[o] || ""}<span><input type="checkbox" data-k="${key}_${slug(o)}" data-g="${key}"> ${esc(o)}</span></label>`).join("") + `</div>`;
+      continue;
+    }
+    if (key === "op_chairs"){ chairs = `<div class="row"><div class="lab">${esc(f.label)}</div><div class="val">${widget(f)}</div></div>`; continue; }
+    rows += `<div class="row"><div class="lab">${esc(f.label)}</div><div class="val">${widget(f)}</div></div>`;
+  }
+  let qa = "";
+  if (code === "qa"){
+    qa = `<div class="bar" style="background:${color};border-radius:0;margin-top:0">Quality Standard Requirements / متطلبات الجودة القياسية</div>
+      <div style="padding:8px 12px" class="muted"><i>All items are ticked by default (standard for every branch). Untick any item that does NOT apply to this branch.</i></div>
+      <table class="qtab"><tr><th>#</th><th>Req.</th><th>Requirement / المتطلب</th></tr>` +
+      SPEC.qa_reqs.map((k, i) => { const f = F(k); return `<tr><td class="n">${i+1}</td><td class="c"><input type="checkbox" data-k="${k}" data-req="1"></td>
+        <td>${esc(f.en)}<div class="ar" dir="rtl">${esc(f.ar)}</div></td></tr>`; }).join("") + `</table>`;
+  }
+  return `<div class="sec"><div class="bar" style="background:${color}"><span>${esc(s.title)}${s.by ? ` <small>Completed by ${esc(s.by)} Dept.</small>` : ""}</span></div>
+    ${rows}${grid}${chairs ? `<div>${chairs}</div>` : ""}${qa}</div>`;
+}
+
+function fillInputs(root, values){
+  root.querySelectorAll("[data-k]").forEach(el => {
+    const k = el.dataset.k;
+    if (el.type === "checkbox"){
+      const f = F(k);
+      el.checked = el.dataset.req ? getVal(values, k, f) : !!values[k];
+      const lab = el.closest(".opt"); if (lab) lab.classList.toggle("on", el.checked);
+    } else {
+      el.value = values[k] ?? "";
+    }
+  });
+}
+
+
+function showVal(f, values){
+  if (!values) return `<span class="empty">—</span>`;
+  if (f.type === "req"){ const on = getVal(values, f.key, f); return `<span class="pill ${on ? "on" : "off"}">${on ? "☑ Required" : "☐ Not required"}</span>`; }
+  if (f.type === "text" || f.type === "date"){
+    const v = values[f.key]; return v ? esc(v).replace(/\n/g, "<br>") : `<span class="empty">—</span>`;
+  }
+  if (f.key === "op_seating" && SPEC.seat_svgs){
+    const on = f.opts.filter(o => values[`${f.key}_${slug(o)}`]);
+    return on.length ? `<div class="seatsum">${on.map(o => `<figure>${SPEC.seat_svgs[o] || ""}<figcaption>☑ ${esc(o)}</figcaption></figure>`).join("")}</div>` : `<span class="empty">—</span>`;
+  }
+  let h = f.opts.map(o => { const on = !!values[`${f.key}_${slug(o)}`]; return `<span class="pill ${on ? "on" : "off"}">${on ? "☑" : "☐"} ${esc(o)}</span>`; }).join("");
+  if (f.extra){ const v = values[f.extra[0]]; if (v) h += `<div class="extra">${esc(f.extra[1])}: <span style="font-style:normal;color:var(--body)">${esc(v)}</span></div>`; }
+  return h;
+}
+
+function summaryTable(title, color, groups, answers, audience){
+  let h = `<div class="sec"><div class="bar" style="background:${color}"><span>${title} <small>Hand this section to ${audience}</small></span></div>
+    <table class="sum"><tr><th>Requirement</th><th>Value (auto)</th><th>Source Dept.</th></tr>`;
+  for (const [gname, keys] of groups){
+    h += `<tr class="grp"><td colspan="3" style="color:${color}">${esc(gname)}</td></tr>`;
+    for (const key of keys){
+      const f = F(key);
+      const a = answers[f.sec]; const values = a && a.values;
+      const src = f.sec === "manual" ? "PM" : SPEC.src[f.sec];
+      if (f.type === "req"){
+        h += `<tr><td class="v" colspan="2">${showVal(f, values || {})} &nbsp;${esc(f.en)}</td><td class="src" style="color:${col("qa")}">Quality</td></tr>`;
+      } else {
+        h += `<tr><td class="req">${esc(f.short)}</td><td class="v">${showVal(f, values)}</td><td class="src" style="color:${col(f.sec === "manual" ? "manual" : f.sec)}">${esc(src)}</td></tr>`;
+      }
+    }
+  }
+  return h + `</table></div>`;
+}
+
+
+
+/* ---------- message encoding ---------- */
+function allowedKeys(d){
+  const keys = new Set();
+  const s = SPEC.sections.find(x => x.code === d);
+  for (const k of s.fields){ const f = F(k);
+    if (f.type === "choice") f.opts.forEach(o => keys.add(`${k}_${slug(o)}`)); else keys.add(k);
+    if (f.extra) keys.add(f.extra[0]); }
+  if (d === "qa") SPEC.qa_reqs.forEach(k => keys.add(k));
+  return keys;
+}
+function encode(d, draft){
+  const v = {};
+  for (const [k, val] of Object.entries(draft.values || {})){
+    const f = F(k);
+    if (f && f.type === "req"){ if (!!val !== !!f.on) v[k] = val ? 1 : 0; continue; }
+    if (val === true) v[k] = 1; else if (typeof val === "string" && val.trim()) v[k] = val.trim();
+  }
+  const payload = {d, br: draft.branch || "", by: draft.by || "", at: Date.now(), v};
+  return "CIL1~" + LZString.compressToEncodedURIComponent(JSON.stringify(payload)) + "~END";
+}
+function decodeAll(text){
+  const out = [];
+  const re = /CIL1~([\s\S]*?)(?:~END|\n\s*\n|$)/g; let m;
+  const src = text.replace(/\r/g, "");
+  while ((m = re.exec(src))){
+    try {
+      const code = m[1].replace(/[^A-Za-z0-9+\-$_]/g, "");
+      const p = JSON.parse(LZString.decompressFromEncodedURIComponent(code));
+      if (!p || !DEPTS.includes(p.d)) continue;
+      const ok = allowedKeys(p.d), values = {};
+      for (const [k, val] of Object.entries(p.v || {})){
+        if (!ok.has(k)) continue;
+        const f = F(k);
+        if (f && f.type === "req") values[k] = !!val;
+        else if (val === 1 || val === true) values[k] = true;
+        else if (typeof val === "string") values[k] = val.slice(0, 4000);
+      }
+      out.push({d: p.d, branch: String(p.br || "").slice(0, 120), by: String(p.by || "").slice(0, 120), at: +p.at || Date.now(), values});
+    } catch {}
+  }
+  return out;
+}
+
+/* ---------- branch link (#b=...) ---------- */
+const HOSTED = /^https?:$/.test(location.protocol) && !/claudeusercontent|claude\.ai/.test(location.host);
+function presetFromHash(){
+  try {
+    if (!location.hash.startsWith("#b=")) return null;
+    const p = JSON.parse(LZString.decompressFromEncodedURIComponent(location.hash.slice(3)));
+    if (!p || typeof p.branch !== "string" || typeof p.values !== "object") return null;
+    const ok = allowedKeys("branch"), values = {};
+    for (const [k, v] of Object.entries(p.values)) if (ok.has(k) && (v === true || typeof v === "string")) values[k] = typeof v === "string" ? v.slice(0, 500) : v;
+    return {branch: p.branch.slice(0, 120), values, at: p.at};
+  } catch { return null; }
+}
+if (!PRESET) PRESET = presetFromHash();
+function answersFromHash(){
+  if (!location.hash.startsWith("#a=")) return null;
+  const found = decodeAll("CIL1~" + location.hash.slice(3) + "~END");
+  return found.length ? found : null;
+}
+function branchLink(branch, values){
+  const v = {}; for (const [k, val] of Object.entries(values)) if (val === true || (typeof val === "string" && val.trim())) v[k] = val;
+  return location.origin + location.pathname + "#b=" + LZString.compressToEncodedURIComponent(JSON.stringify({branch, values: v, at: Date.now()}));
+}
+
+
+/* ---------- shared folder (Chrome / Edge "pick the folder once") ---------- */
+const CAN_FOLDER = typeof window.showDirectoryPicker === "function";
+function idb(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("cilantro_fs", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("handles");
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function handleGet(key){
+  try { const db = await idb(); return await new Promise((res) => {
+    const q = db.transaction("handles").objectStore("handles").get(key);
+    q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch { return null; }
+}
+async function handleSet(key, h){
+  try { const db = await idb(); db.transaction("handles", "readwrite").objectStore("handles").put(h, key); } catch {}
+}
+async function folderHandle(key, {ask} = {}){
+  let h = await handleGet(key);
+  if (h){
+    let perm = await h.queryPermission({mode: key === "out" ? "readwrite" : "read"}).catch(() => "denied");
+    if (perm !== "granted" && ask) perm = await h.requestPermission({mode: key === "out" ? "readwrite" : "read"}).catch(() => "denied");
+    if (perm === "granted") return h;
+  }
+  if (!ask) return null;
+  try { h = await window.showDirectoryPicker({id: "cilantro_" + key, mode: key === "out" ? "readwrite" : "read"}); }
+  catch { return null; }
+  await handleSet(key, h);
+  return h;
+}
+async function writeToFolder(h, name, text){
+  const fh = await h.getFileHandle(name, {create: true});
+  const w = await fh.createWritable(); await w.write(text); await w.close();
+  return name;
+}
+
+/* ---------- home ---------- */
+function branchInfoCard(values, title){
+  const keys = SPEC.sections.find(s => s.code === "branch").fields.filter(k => k !== "mn_roci");
+  return `<div class="sec"><div class="bar" style="background:${col("branch")}"><span>${title || "BRANCH IDENTIFICATION"} <small>filled by the PM – locked</small></span><span>🔒</span></div>
+    ${keys.map(k => `<div class="row"><div class="lab">${esc(F(k).label)}</div><div class="val">${showVal(F(k), values)}</div></div>`).join("")}</div>`;
+}
+function home(){
+  if (PRESET){
+    $app.innerHTML = `
+    <h1>CILANTRO – STORE REQUIREMENTS FORM</h1>
+    <div class="sub">Branch: <b>${esc(PRESET.branch)}</b></div>
+    ${branchInfoCard(PRESET.values)}
+    <div class="card howto"><b>How it works</b><ol>
+      <li><b>Click your department below</b> – it opens only your questions.</li>
+      <li>Fill in your answers (they stay on your device while you work).</li>
+      <li>Click <b>Send my answers to the PM</b> and send the ready message by WhatsApp or email.</li></ol></div>
+    <h2 style="color:var(--ink);font-size:17px;margin:22px 0 10px">Click on your department – it takes you directly to your questions</h2>
+    <div class="deps">${DEPTS.filter(d => d !== "branch").map(d => `
+      <button class="dep" style="--c:${col(d)}" data-go="${d}"><b>${NAMES[d]}</b><span>▶ Click here to go to your questions</span></button>`).join("")}
+    </div>`;
+    return;
+  }
+  $app.innerHTML = `
+    <h1>CILANTRO – STORE REQUIREMENTS FORM</h1>
+    <div class="sub">Branch Design & Fit-Out Requirements · All Departments</div>
+    <div class="card howto"><b>How it works</b><ol>
+      <li><b>Click your department below</b> – it opens only your questions.</li>
+      <li>Fill in your answers (they stay on your device while you work).</li>
+      <li>Click <b>Send my answers to the PM</b> and send the ready message by WhatsApp or email.</li></ol></div>
+    <h2 style="color:var(--ink);font-size:17px;margin:22px 0 10px">Click on your department – it takes you directly to your questions</h2>
+    <div class="deps">${DEPTS.filter(d => d !== "branch").map(d => `
+      <button class="dep" style="--c:${col(d)}" data-go="${d}"><b>${NAMES[d]}</b><span>▶ Click here to go to your questions</span></button>`).join("")}
+    </div>
+    <div class="card" style="margin-top:26px;background:#fbf8f3">
+      <div class="pmhead"><div><b style="color:var(--ink)">For the PM only</b><div class="note">Branch details, and building the consolidated Sections A & B from the answers you receive.</div></div>
+      <div class="actions" style="margin:0"><button class="btn sec2 small" data-go="branch">Branch Identification</button><button class="btn green small" data-go="share">① Send to departments</button><button class="btn small" data-go="pm">② PM – Consolidated A & B</button></div></div>
+    </div>`;
+}
+
+/* ---------- department form ---------- */
+function deptPage(d){
+  const key = "cil_draft_" + d + (PRESET ? "_" + slug(PRESET.branch) : "");
+  const draft = load(key, {values:{}, by:"", branch:""});
+  const values = draft.values;
+  $app.innerHTML = `
+    <button class="back noprint" data-go="home">← All departments</button>
+    <h1>CILANTRO – STORE REQUIREMENTS FORM</h1>
+    <div class="sub">${esc(NAMES[d])} section</div>
+    <div class="card"><label for="branch" style="font-weight:600;color:var(--ink)">Branch name <span class="note">(as written in the PM's message)</span></label>
+      <input type="text" id="branch" placeholder="e.g. Cilantro Mall of Egypt"></div>
+    <div id="form">${renderSection(d, values)}</div>
+    <div class="card" id="sendcard">
+      <label for="by" style="font-weight:600;color:var(--ink)">Your name</label>
+      <input type="text" id="by" placeholder="Type your name">
+      <div class="actions"><button class="btn green" id="send">Send my answers to the PM</button></div>
+      <div id="sendout"></div>
+      <p class="note" style="margin:10px 0 0">Your answers are kept on this device until you send them – you can close the page and come back.</p>
+    </div>`;
+  const $form = document.getElementById("form");
+  fillInputs($form, values);
+  const $by = document.getElementById("by"), $br = document.getElementById("branch");
+  $by.value = draft.by || ""; $br.value = draft.branch || "";
+  if (PRESET){ $br.value = PRESET.branch; draft.branch = PRESET.branch; $br.readOnly = true; $br.style.background = "var(--auto)";
+    $br.insertAdjacentHTML("afterend", `<div class="note" style="margin-top:6px">🔒 Set by the PM for this branch.</div>`); }
+  let t = null;
+  const persist = () => { clearTimeout(t); t = setTimeout(() => { draft.by = $by.value; draft.branch = $br.value; setStatus(save(key, draft) ? "Saved on this device ✓" : ""); }, 500); };
+  $by.addEventListener("input", persist); $br.addEventListener("input", persist);
+  $form.addEventListener("input", e => { const el = e.target; if (!el.dataset.k || el.type === "checkbox") return; values[el.dataset.k] = el.value; persist(); });
+  $form.addEventListener("change", e => {
+    const el = e.target; if (!el.dataset.k || el.type !== "checkbox") return;
+    const g = el.dataset.g;
+    if (g && el.checked && !MULTI.has(g)){
+      $form.querySelectorAll(`input[data-g="${g}"]`).forEach(o => { if (o !== el && o.checked){ o.checked = false; values[o.dataset.k] = false; o.closest(".opt").classList.remove("on"); } });
+    }
+    values[el.dataset.k] = el.checked;
+    const lab = el.closest(".opt"); if (lab) lab.classList.toggle("on", el.checked);
+    persist();
+  });
+  document.getElementById("send").addEventListener("click", () => {
+    const out = document.getElementById("sendout");
+    if (!$br.value.trim() || !$by.value.trim()){
+      out.innerHTML = `<div class="banner err">Please write the branch name (top of the page) and your name first.</div>`;
+      (!$br.value.trim() ? $br : $by).focus(); return;
+    }
+    draft.by = $by.value.trim(); draft.branch = $br.value.trim(); save(key, draft);
+    if (d === "branch" && !values.br_name) values.br_name = draft.branch;
+    if (d === "branch"){
+      addToPM([{d, branch: draft.branch, by: draft.by, at: Date.now(), values: {...values}}]);
+      out.innerHTML = `<div class="banner ok">Branch details saved. Now create the ${HOSTED ? "link" : "file"} you will send to the departments – the branch details will be filled in and locked for them.</div>
+        <div class="actions">${HOSTED ? `<button class="btn green" id="mklink">🔗 Create link for departments</button>` : ""}
+        ${CAN_DOWNLOAD ? `<button class="btn ${HOSTED ? "sec2" : "green"}" id="mkfile">⬇ Create file for departments</button>` : ""}
+        <button class="btn sec2" data-go="share">Next: Send to departments</button><button class="btn sec2" data-go="pm">PM – Consolidated A & B</button></div>
+        <p class="note" id="mknote"></p>`;
+      const ml = document.getElementById("mklink");
+      if (ml) ml.onclick = () => {
+        const link = branchLink(draft.branch, values);
+        const links = load("cil_links", {}); links[draft.branch] = link; save("cil_links", links);
+        const msg = groupText(draft.branch, "");
+        document.getElementById("mknote").innerHTML = `<b>Link for ${esc(draft.branch)}</b> (branch details locked):
+          <div class="msg" style="margin-top:6px">${esc(link)}</div>
+          <div class="actions"><button class="btn sec2 small" id="cplink">Copy link</button>
+          <a class="btn green small" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp to departments</a>
+          <a class="btn small" target="_blank" rel="noopener" href="mailto:?subject=${encodeURIComponent("Cilantro Store Requirements – " + draft.branch)}&body=${encodeURIComponent(msg)}">Email to departments</a></div>`;
+        document.getElementById("cplink").onclick = async e => { try { await navigator.clipboard.writeText(link); e.target.textContent = "Copied ✓"; } catch { prompt("Copy this link:", link); } };
+      };
+      const mk = document.getElementById("mkfile");
+      if (mk) mk.onclick = () => { const name = downloadBranchFile(draft.branch, {...values});
+        document.getElementById("mknote").innerHTML = `Saved to your <b>Downloads</b> folder as <b>${esc(name)}</b>. Attach this file when you send the form to the departments.`; };
+      out.scrollIntoView({behavior:"smooth", block:"center"});
+      return;
+    }
+    const code = encode(d, draft);
+    const replyLink = HOSTED ? location.origin + location.pathname + "#a=" + code.replace(/^CIL1~|~END$/g, "") : "";
+    const msg = replyLink
+      ? `Cilantro Store Requirements\nBranch: ${draft.branch}\nDepartment: ${NAMES[d]}\nFilled by: ${draft.by}\n\nMy answers (open this link to add them):\n${replyLink}`
+      : `Cilantro Store Requirements\nBranch: ${draft.branch}\nDepartment: ${NAMES[d]}\nFilled by: ${draft.by}\n\n${code}`;
+    const subject = `Cilantro Store Requirements – ${draft.branch} – ${NAMES[d]}`;
+    out.innerHTML = `<div class="banner ok">Your answers are ready. Send them to the PM with one of the buttons below.${replyLink ? " The PM only has to click the link – nothing to copy or paste." : ""}</div>
+      <div class="msg" id="msgtext">${esc(msg)}</div>
+      <div class="actions">
+        <a class="btn green" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">Send by WhatsApp</a>
+        <a class="btn" target="_blank" rel="noopener" href="mailto:${PM_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}">Send by email</a>
+        <button class="btn sec2" id="copy">Copy message</button>
+        ${CAN_FOLDER ? `<button class="btn green" id="tofolder">📁 Save into the shared folder</button>` : ""}
+        ${CAN_DOWNLOAD ? `<button class="btn sec2" id="savefile">⬇ Save answer file</button>` : ""}</div>
+      <p class="note" id="savenote"></p>
+      <p class="note">If a button does not open, click <b>Copy message</b> and paste it into WhatsApp or an email to ${PM_EMAIL}.</p>`;
+    const fileName = `Answers_${slug(draft.branch)}_${slug(NAMES[d])}.txt`;
+    const tf = document.getElementById("tofolder");
+    if (tf) tf.onclick = async () => {
+      const note = document.getElementById("savenote");
+      note.textContent = "Choose the shared folder…";
+      const h = await folderHandle("out", {ask: true});
+      if (!h){ note.innerHTML = `Folder not chosen. You can use <b>⬇ Save answer file</b> instead, then move the file yourself.`; return; }
+      try { await writeToFolder(h, fileName, msg);
+        note.innerHTML = `✓ Saved as <b>${esc(fileName)}</b> in the shared folder <b>${esc(h.name)}</b>. Nothing else to send – just tell the PM you are done.`; }
+      catch (e){ note.innerHTML = `Could not write to that folder (${esc(e.message || "no permission")}). Use <b>⬇ Save answer file</b> instead.`; }
+    };
+    const sf = document.getElementById("savefile");
+    if (sf) sf.onclick = () => {
+      const fn = `Answers_${slug(draft.branch)}_${slug(NAMES[d])}.txt`;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([msg], {type: "text/plain"})); a.download = fn;
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      document.getElementById("savenote").innerHTML = `Saved as <b>${esc(fn)}</b> in your Downloads folder. Move it into the shared folder the PM gave you (or attach it to an email).`;
+    };
+    document.getElementById("copy").onclick = async (ev) => {
+      try { await navigator.clipboard.writeText(msg); ev.target.textContent = "Copied ✓"; }
+      catch { const r = document.createRange(); r.selectNodeContents(document.getElementById("msgtext")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); ev.target.textContent = "Selected – press Ctrl+C"; }
+    };
+    out.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+  if (d === "branch") document.getElementById("send").textContent = "Save branch details";
+}
+
+/* ---------- PM: consolidated ---------- */
+function addToPM(list){
+  const pm = load("cil_pm", {answers:{}});
+  for (const a of list){ pm.answers[a.d] = a; if (a.d === "branch" || !pm.branch) pm.branch = a.branch || pm.branch; }
+  save("cil_pm", pm);
+  return pm;
+}
+function pmPage(flash){
+  const pm = load("cil_pm", {answers:{}});
+  const ans = pm.answers;
+  const chips = DEPTS.map(d => { const a = ans[d];
+    return `<span class="chip ${a ? "done" : ""}" title="${a ? "Received " + fmtDate(a.at) + (a.by ? " from " + esc(a.by) : "") : "Not received yet"}">${a ? "✓" : "–"} ${NAMES[d]}</span>`; }).join("");
+  const names = [...new Set(Object.values(ans).map(a => (a.branch || "").trim().toLowerCase()).filter(Boolean))];
+  const warn = names.length > 1 ? `<div class="banner err">Answers here come from different branch names (${names.map(esc).join(", ")}). Check that every department filled the same branch.</div>` : "";
+  $app.innerHTML = `
+    <button class="back noprint" data-go="home">← Home</button>
+    <h1>CILANTRO – CONSOLIDATED REQUIREMENTS</h1>
+    <div class="sub">${esc(pm.branch || "No branch yet")} · built from the departments' answers · read-only</div>
+    ${flash || ""}${warn}
+    <div class="card noprint">
+      <p class="step">Answers from the departments</p>
+      <p class="note" style="margin:-2px 0 8px">Easiest: <b>📁 Read the shared folder</b> – pick the branch folder once and every department's answers are read in one click. Other ways: <b>click the link</b> a department sends you · <b>📂 Open answer files</b> to pick their saved files from the shared folder (you can select all of them at once) · or paste a message below.</p>
+      <textarea id="paste" placeholder="Paste the whole WhatsApp or email message here (you can paste several messages at once)"></textarea>
+      <div class="actions"><button class="btn green" id="add">Add answers</button>
+        ${CAN_FOLDER ? `<button class="btn sec2" id="readfolder">📁 Read the shared folder</button>` : ""}
+        <label class="btn sec2" for="pickfiles" style="display:inline-block">📂 Open answer files</label>
+        <input type="file" id="pickfiles" accept=".txt,.html,.htm,.eml,text/plain" multiple hidden>
+        <button class="btn sec2 small" data-go="branch">Fill Branch Identification</button>
+        <button class="btn sec2 small" data-go="share">Send to departments</button>
+        <button class="btn small" id="print">Print / Save as PDF</button>
+        <button class="btn sec2 small" id="clear" style="margin-left:auto">Start a new branch</button></div>
+      <div style="margin-top:12px"><b style="color:var(--ink)">Received</b> <span class="note">(✓ received · – waiting)</span><div class="chips" style="margin-top:6px">${chips}</div></div>
+    </div>
+    <div class="sumwrap">${summaryTable("A. ARCHITECTURE DESIGN HOUSE REQUIREMENTS", col("A"), SPEC.A, ans, "the architecture design house")}</div>
+    <div class="sumwrap">${summaryTable("B. MEP REQUIREMENTS", col("B"), SPEC.B, ans, "the MEP consultant / contractor")}</div>`;
+  document.getElementById("add").onclick = () => {
+    const found = decodeAll(document.getElementById("paste").value);
+    if (!found.length){ pmPage(`<div class="banner err">No answers found in that text. Paste the whole message, including the line that starts with CIL1~ and ends with ~END.</div>`); return; }
+    addToPM(found);
+    pmPage(`<div class="banner ok">Added: ${found.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")}. Sections A & B are updated below.</div>`);
+  };
+  const rf = document.getElementById("readfolder");
+  if (rf) rf.onclick = async () => {
+    rf.textContent = "Choosing folder…";
+    const h = await folderHandle("in", {ask: true});
+    rf.textContent = "📁 Read the shared folder";
+    if (!h){ pmPage(`<div class="banner err">No folder chosen.</div>`); return; }
+    const texts = [];
+    try { for await (const [name, entry] of h.entries()){
+      if (entry.kind !== "file" || !/^Answers_.*\.txt$/i.test(name)) continue;
+      texts.push(await (await entry.getFile()).text());
+    } } catch (e){ pmPage(`<div class="banner err">Could not read that folder (${esc(e.message || "no permission")}).</div>`); return; }
+    if (!texts.length){ pmPage(`<div class="banner err">No answer files found in <b>${esc(h.name)}</b>. The departments' files must be named Answers_….txt</div>`); return; }
+    const found = decodeAll(texts.join("\n\n"));
+    if (!found.length){ pmPage(`<div class="banner err">Found ${texts.length} file(s) in <b>${esc(h.name)}</b> but no answers inside them.</div>`); return; }
+    addToPM(found);
+    pmPage(`<div class="banner ok">Read <b>${esc(h.name)}</b>: ${found.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")}. Sections A & B are updated below.</div>`);
+  };
+  document.getElementById("pickfiles").onchange = async (ev) => {
+    const files = [...ev.target.files]; if (!files.length) return;
+    const texts = await Promise.all(files.map(f => f.text().catch(() => "")));
+    const found = decodeAll(texts.join("\n\n"));
+    if (!found.length){ pmPage(`<div class="banner err">No answers found in ${files.length} file(s). Open one of them and check it contains the line starting with CIL1~.</div>`); return; }
+    addToPM(found);
+    pmPage(`<div class="banner ok">Added from ${files.length} file(s): ${found.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")}. Sections A & B are updated below.</div>`);
+  };
+  document.getElementById("print").onclick = () => window.print();
+  document.getElementById("clear").onclick = (ev) => {
+    if (ev.target.dataset.sure !== "1"){ ev.target.dataset.sure = "1"; ev.target.textContent = "Click again to clear all answers"; return; }
+    save("cil_pm", {answers:{}}); try { localStorage.removeItem("cil_draft_branch"); } catch {} pmPage(`<div class="banner ok">Cleared. Ready for a new branch.</div>`);
+  };
+}
+
+
+/* ---------- PM: send invitations ---------- */
+const IS_FILE = location.protocol === "file:";
+const FORM_LINK = /^https?:$/.test(location.protocol) && !/claudeusercontent|claude\.ai/.test(location.host)
+  ? location.origin + location.pathname
+  : (IS_FILE ? "" : "https://claude.ai/artifact/6A32ksmjA4V67kLzBYJfct");
+const openStep = branch => {
+  const bl = HOSTED ? (load("cil_links", {})[branch] || "") : "";
+  if (bl) return `1) Open this link: ${bl}`;
+  return FORM_LINK ? `1) Open this link: ${FORM_LINK}` : `1) Open the attached file "${branchFileName(branch)}" (double-click it)`;
+};
+function downloadBranchFile(branch, values){
+  const preset = {branch, values, at: Date.now()};
+  const marker = "let PRESET" + " = null;";
+  const html = SRC_HTML.replace(marker, () => "const PRESET = " + JSON.stringify(preset).replace(/</g, "\\u003c") + ";");
+  const name = branchFileName(branch);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([html], {type: "text/html"})); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  return name;
+}
+function inviteText(d, branch, due){
+  return `Dear ${NAMES[d]} team,\n\nPlease fill in your section of the Cilantro Store Requirements Form for:\nBranch: ${branch}${due ? `\nPlease reply by: ${due}` : ""}\n\n${openStep(branch)}\n2) Click "${NAMES[d]}"\n3) Fill in your answers, then click "Send my answers to the PM".\n\nThank you,\nMohamed – PM`;
+}
+function groupText(branch, due){
+  return `Dear all,\n\nPlease fill in your department's section of the Cilantro Store Requirements Form for:\nBranch: ${branch}${due ? `\nPlease reply by: ${due}` : ""}\n\n${openStep(branch)}\n2) Click your department's name\n3) Fill in your answers, then click "Send my answers to the PM".\n\nDepartments: ${DEPTS.filter(d => d !== "branch").map(d => NAMES[d]).join(", ")}.\n\nThank you,\nMohamed – PM`;
+}
+function sharePage(){
+  const pm = load("cil_pm", {answers:{}});
+  const st = load("cil_share", {branch: pm.branch || "", due: ""});
+  $app.innerHTML = `
+    <button class="back noprint" data-go="home">← Home</button>
+    <h1>SEND THE FORM TO THE DEPARTMENTS</h1>
+    <div class="sub">One link for everyone – each person clicks their own department</div>
+    <div class="card">
+      <label for="sbranch" style="font-weight:600;color:var(--ink)">Branch name</label>
+      <input type="text" id="sbranch" placeholder="e.g. Cilantro Mall of Egypt">
+      <label for="sdue" style="font-weight:600;color:var(--ink);display:block;margin-top:10px">Reply by <span class="note">(optional)</span></label>
+      <input type="text" id="sdue" placeholder="e.g. Thursday 25 Sept">
+    </div>
+    <div class="card" style="border:2px solid var(--accent)">
+      <p class="step">Fastest: one message to a WhatsApp group or one email to everyone</p>
+      <div class="actions"><a class="btn green" id="g_wa" target="_blank" rel="noopener">WhatsApp (choose group)</a>
+        <a class="btn" id="g_mail" target="_blank" rel="noopener">Email to all</a>
+        <button class="btn sec2" id="g_copy">Copy message</button></div>
+      <div class="msg" id="g_msg" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <p class="step">Or send to each department separately</p>
+      <table class="links">${DEPTS.filter(d => d !== "branch").map(d => `<tr><td><b style="color:${col(d)}">${NAMES[d]}</b></td><td>
+        <a class="btn green small" data-wa="${d}" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="btn sec2 small" data-mail="${d}" target="_blank" rel="noopener">Email</a>
+        <button class="btn sec2 small" data-cp="${d}">Copy</button></td></tr>`).join("")}</table>
+    </div>
+    <p class="note" id="sharenote"></p>`;
+  const $b = document.getElementById("sbranch"), $d = document.getElementById("sdue");
+  $b.value = st.branch; $d.value = st.due;
+  const refresh = () => {
+    const branch = $b.value.trim() || "(branch name)", due = $d.value.trim();
+    save("cil_share", {branch: $b.value, due: $d.value});
+    const g = groupText(branch, due), subj = `Cilantro Store Requirements – ${branch}`;
+    document.getElementById("g_msg").textContent = g;
+    document.getElementById("g_wa").href = "https://wa.me/?text=" + encodeURIComponent(g);
+    document.getElementById("g_mail").href = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(g)}`;
+    $app.querySelectorAll("[data-wa]").forEach(a => a.href = "https://wa.me/?text=" + encodeURIComponent(inviteText(a.dataset.wa, branch, due)));
+    $app.querySelectorAll("[data-mail]").forEach(a => a.href = `mailto:?subject=${encodeURIComponent(subj + " – " + NAMES[a.dataset.mail])}&body=${encodeURIComponent(inviteText(a.dataset.mail, branch, due))}`);
+  };
+  const note = () => { document.getElementById("sharenote").innerHTML = IS_FILE
+      ? `Attach the branch file <b>${esc(branchFileName($b.value.trim()))}</b> (made in <b>Branch Identification → Create file for departments</b>) to your email / WhatsApp message.`
+      : "Everyone uses the same link: <b>" + esc(FORM_LINK) + "</b>"; };
+  $b.addEventListener("input", note); note();
+  $b.addEventListener("input", refresh); $d.addEventListener("input", refresh); refresh();
+  const copy = async (btn, text) => {
+    try { await navigator.clipboard.writeText(text); btn.textContent = "Copied ✓"; }
+    catch { prompt("Copy this message:", text); }
+    setTimeout(() => btn.textContent = btn.id === "g_copy" ? "Copy message" : "Copy", 1500);
+  };
+  document.getElementById("g_copy").onclick = e => copy(e.target, document.getElementById("g_msg").textContent);
+  $app.querySelectorAll("[data-cp]").forEach(b => b.onclick = () => copy(b, inviteText(b.dataset.cp, $b.value.trim() || "(branch name)", $d.value.trim())));
+}
+
+/* ---------- router ---------- */
+function go(where){
+  if (PRESET && !DEPTS.slice(1).includes(where)) where = "home";
+  window.scrollTo(0, 0); setStatus("");
+  if (where === "home") home(); else if (where === "pm") pmPage(); else if (where === "share") sharePage(); else deptPage(where);
+  try { sessionStorage.setItem("cil_view", where); } catch {}
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b){ e.preventDefault(); go(b.dataset.go); } });
+window.addEventListener("hashchange", () => location.reload());
+const incoming = answersFromHash();
+if (incoming){
+  addToPM(incoming);
+  try { history.replaceState(null, "", location.pathname); } catch {}
+  pmPage(`<div class="banner ok">✓ Answers received from ${incoming.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")} for branch <b>${esc(incoming[0].branch || "")}</b>. Sections A & B are updated below.</div>`);
+  try { sessionStorage.setItem("cil_view", "pm"); } catch {}
+} else {
+  let startView = "home"; try { startView = sessionStorage.getItem("cil_view") || "home"; } catch {}
+  go(DEPTS.includes(startView) || startView === "pm" || startView === "share" ? startView : "home");
+}
+</script>
+
+</body>
+</html>
