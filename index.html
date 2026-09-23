@@ -672,17 +672,237 @@ function go(where){
   try { sessionStorage.setItem("cil_view", where); } catch {}
 }
 document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b){ e.preventDefault(); go(b.dataset.go); } });
-window.addEventListener("hashchange", () => location.reload());
-const incoming = answersFromHash();
-if (incoming){
-  addToPM(incoming);
-  try { history.replaceState(null, "", location.pathname); } catch {}
-  pmPage(`<div class="banner ok">✓ Answers received from ${incoming.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")} for branch <b>${esc(incoming[0].branch || "")}</b>. Sections A & B are updated below.</div>`);
-  try { sessionStorage.setItem("cil_view", "pm"); } catch {}
-} else {
-  let startView = "home"; try { startView = sessionStorage.getItem("cil_view") || "home"; } catch {}
-  go(DEPTS.includes(startView) || startView === "pm" || startView === "share" ? startView : "home");
+
+/* ================= WEBSITE MODE (answers saved on the site) ================= */
+const API = "/api/form";
+let SERVER = false, PMPIN = "";
+try { PMPIN = sessionStorage.getItem("cil_pin") || ""; } catch {}
+const qp = new URLSearchParams(location.search);
+
+async function apiCall(method, qs, body){
+  const headers = {"Content-Type": "application/json"};
+  if (PMPIN) headers["x-pin"] = PMPIN;
+  const r = await fetch(API + (qs ? "?" + new URLSearchParams(qs) : ""), {method, headers, body: body ? JSON.stringify(body) : undefined});
+  let j = {}; try { j = await r.json(); } catch {}
+  if (!r.ok) throw new Error(j.error || ("Server error " + r.status));
+  return j;
 }
+async function detectServer(){
+  try { const r = await fetch(API + "?ping=1"); if (!r.ok) return false; const j = await r.json(); return !!j.ok; }
+  catch { return false; }
+}
+const deptLink = (id, k) => `${location.origin}${location.pathname}?b=${encodeURIComponent(id)}&k=${k}`;
+function progressChips(progress){
+  return DEPTS.filter(d => d !== "branch").map(d => { const p = (progress || {})[d];
+    const cls = p && p.submittedAt ? "done" : (p && p.updatedAt ? "wip" : "");
+    const tip = p && p.submittedAt ? "Submitted " + fmtDate(p.submittedAt) + (p.by ? " by " + p.by : "") : (p && p.updatedAt ? "Started, not submitted" : "Not started");
+    return `<span class="chip ${cls}" title="${esc(tip)}">${p && p.submittedAt ? "✓" : p && p.updatedAt ? "…" : "–"} ${NAMES[d]}</span>`; }).join("");
+}
+
+/* ---- department side ---- */
+async function srvBranch(id, k, dept){
+  let data;
+  setStatus("Loading…");
+  try { data = await apiCall("GET", {b: id, k}); } catch (e){
+    $app.innerHTML = `<h1>CILANTRO – STORE REQUIREMENTS FORM</h1><div class="banner err">${esc(e.message)}</div>`; setStatus(""); return; }
+  setStatus("");
+  const br = data.branch, ans = data.answers || {};
+  if (!dept){
+    $app.innerHTML = `
+      <h1>CILANTRO – STORE REQUIREMENTS FORM</h1>
+      <div class="sub">Branch: <b>${esc(br.name)}</b></div>
+      ${branchInfoCard(br.values || {})}
+      <div class="card howto"><b>How it works</b><ol>
+        <li><b>Click your department below</b> – it opens only your questions.</li>
+        <li>Fill in your answers. They are <b>saved on this website</b> as you type, so you can close the page and come back.</li>
+        <li>When you finish, type your name and click <b>Submit my section</b>. Nothing to send – the PM sees it straight away.</li></ol></div>
+      <h2 style="color:var(--ink);font-size:17px;margin:22px 0 10px">Click on your department – it takes you directly to your questions</h2>
+      <div class="deps">${DEPTS.filter(d => d !== "branch").map(d => { const a = ans[d];
+        const state = a && a.submittedAt ? `✓ Submitted ${fmtDate(a.submittedAt)}` : (a && a.updatedAt ? "… In progress – continue" : "▶ Click here to go to your questions");
+        return `<button class="dep" style="--c:${col(d)}" data-dept="${d}"><b>${NAMES[d]}</b><span${a && a.submittedAt ? ' style="color:var(--accent)"' : ""}>${state}</span></button>`; }).join("")}
+      </div>`;
+    $app.querySelectorAll("[data-dept]").forEach(b => b.onclick = () => srvBranch(id, k, b.dataset.dept));
+    return;
+  }
+  const mine = ans[dept] || {values: {}, by: ""};
+  const values = {...(mine.values || {})};
+  $app.innerHTML = `
+    <button class="back noprint" id="backdep">← All departments</button>
+    <h1>CILANTRO – STORE REQUIREMENTS FORM</h1>
+    <div class="sub">${esc(br.name)} · ${esc(NAMES[dept])} section</div>
+    <div id="banner">${mine.submittedAt ? `<div class="banner ok">✓ Submitted on ${fmtDate(mine.submittedAt)}${mine.by ? " by " + esc(mine.by) : ""}. You can still change your answers and submit again.</div>` : ""}</div>
+    <div id="form">${renderSection(dept, values)}</div>
+    <div class="card"><label for="by" style="font-weight:600;color:var(--ink)">Your name</label>
+      <input type="text" id="by" placeholder="Type your name">
+      <div class="actions"><button class="btn green" id="submit">Submit my section</button></div>
+      <p class="note" style="margin:10px 0 0">Saved on this website automatically – no file to download, nothing to email.</p></div>`;
+  const $form = document.getElementById("form");
+  fillInputs($form, values);
+  const $by = document.getElementById("by"); $by.value = mine.by || "";
+  document.getElementById("backdep").onclick = () => srvBranch(id, k);
+
+  const dirty = new Set(); let timer = null, saving = false;
+  async function flush(submit){
+    if (saving){ clearTimeout(timer); timer = setTimeout(() => flush(submit), 400); return; }
+    if (!dirty.size && !submit) return;
+    const payload = {}; dirty.forEach(x => payload[x] = values[x]); dirty.clear();
+    saving = true; setStatus("Saving…");
+    try {
+      const r = await apiCall("POST", null, {action: "save", b: id, k, d: dept, values: payload, by: $by.value.trim(), submit: !!submit});
+      setStatus("All answers saved ✓");
+      if (submit){
+        document.getElementById("banner").innerHTML = `<div class="banner ok">✓ Thank you. Your section was submitted on ${fmtDate(r.submittedAt)} and the PM can see it now.</div>`;
+        window.scrollTo({top: 0, behavior: "smooth"});
+      }
+    } catch (e){
+      Object.keys(payload).forEach(x => dirty.add(x));
+      setStatus("Not saved – check your internet. Retrying…", true);
+      clearTimeout(timer); timer = setTimeout(() => flush(submit), 5000);
+    } finally { saving = false; }
+  }
+  const schedule = () => { clearTimeout(timer); setStatus("Saving…"); timer = setTimeout(() => flush(false), 1200); };
+  $form.addEventListener("input", e => { const el = e.target; if (!el.dataset.k || el.type === "checkbox") return;
+    values[el.dataset.k] = el.value; dirty.add(el.dataset.k); schedule(); });
+  $form.addEventListener("change", e => {
+    const el = e.target; if (!el.dataset.k || el.type !== "checkbox") return;
+    const g = el.dataset.g;
+    if (g && el.checked && !MULTI.has(g)) $form.querySelectorAll(`input[data-g="${g}"]`).forEach(o => {
+      if (o !== el && o.checked){ o.checked = false; values[o.dataset.k] = false; dirty.add(o.dataset.k); o.closest(".opt").classList.remove("on"); } });
+    values[el.dataset.k] = el.checked; dirty.add(el.dataset.k);
+    const lab = el.closest(".opt"); if (lab) lab.classList.toggle("on", el.checked);
+    schedule();
+  });
+  $by.addEventListener("input", () => { dirty.add("br_x_name_touch"); dirty.delete("br_x_name_touch"); clearTimeout(timer); timer = setTimeout(() => flush(false), 1200); });
+  document.getElementById("submit").onclick = async () => {
+    if (!$by.value.trim()){ document.getElementById("banner").innerHTML = `<div class="banner err">Please write your name before submitting.</div>`; $by.focus(); window.scrollTo({top: 0, behavior: "smooth"}); return; }
+    $form.querySelectorAll("input[data-req]").forEach(el => { values[el.dataset.k] = el.checked; dirty.add(el.dataset.k); });
+    clearTimeout(timer); await flush(true);
+  };
+}
+
+/* ---- PM side ---- */
+function srvPinGate(msg){
+  $app.innerHTML = `<h1>CILANTRO – STORE REQUIREMENTS FORM</h1><div class="sub">PM control panel</div>
+    <div class="card" style="max-width:380px;margin:30px auto">${msg ? `<div class="banner err">${esc(msg)}</div>` : ""}
+    <label for="pin" style="font-weight:600;color:var(--ink)">PM PIN</label>
+    <input type="password" id="pin" inputmode="numeric" autocomplete="off">
+    <div class="actions"><button class="btn" id="go" style="width:100%">Open</button></div></div>`;
+  const go = () => { PMPIN = document.getElementById("pin").value.trim(); try { sessionStorage.setItem("cil_pin", PMPIN); } catch {} srvPM(); };
+  document.getElementById("go").onclick = go;
+  document.getElementById("pin").onkeydown = e => { if (e.key === "Enter") go(); };
+}
+async function srvPM(flash){
+  if (!PMPIN) return srvPinGate("");
+  let data;
+  try { data = await apiCall("GET", {list: 1}); }
+  catch (e){ PMPIN = ""; try { sessionStorage.removeItem("cil_pin"); } catch {} return srvPinGate(e.message); }
+  $app.innerHTML = `<h1>CILANTRO – STORE REQUIREMENTS FORM</h1><div class="sub">PM control panel · answers are saved on this website</div>
+    ${flash || ""}
+    <div class="card"><p class="step">New branch</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="newname" placeholder="Branch name, e.g. Cilantro Mall of Egypt" style="flex:1;min-width:220px">
+      <button class="btn green" id="create">Create branch</button></div>
+      <p class="note" style="margin:8px 0 0">You then fill in the branch details, and the departments see them locked.</p></div>
+    <div id="list"></div>`;
+  const $list = document.getElementById("list");
+  if (!data.branches.length) $list.innerHTML = `<p class="center note">No branches yet – create the first one above.</p>`;
+  for (const br of data.branches){
+    const link = deptLink(br.id, br.key);
+    const msg = `Dear all,\n\nPlease fill in your department's section of the Cilantro Store Requirements Form for:\nBranch: ${br.name}\n\n1) Open this link: ${link}\n2) Click your department's name\n3) Fill in your answers, then click "Submit my section".\n\nThank you,\nMohamed – PM`;
+    const el = document.createElement("div"); el.className = "card";
+    el.innerHTML = `<div class="pmhead"><div><b style="font-size:17px;color:var(--ink)">${esc(br.name)}</b>
+        <span class="note">created ${fmtDate(br.createdAt)}</span></div>
+      <div class="actions" style="margin:0">
+        <button class="btn sec2 small" data-edit="${br.id}">Branch details</button>
+        <button class="btn sec2 small" data-copy="${esc(link)}">Copy link</button>
+        <a class="btn green small" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp</a>
+        <a class="btn sec2 small" target="_blank" rel="noopener" href="mailto:?subject=${encodeURIComponent("Cilantro Store Requirements – " + br.name)}&body=${encodeURIComponent(msg)}">Email</a>
+        <button class="btn small" data-sum="${br.id}">Consolidated A &amp; B</button></div></div>
+      <div class="chips" style="margin-top:8px">${progressChips(br.progress)}</div>`;
+    $list.appendChild(el);
+  }
+  $app.querySelectorAll("[data-copy]").forEach(b => b.onclick = async () => {
+    const orig = b.dataset.label || (b.dataset.label = b.textContent);
+    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied ✓"; } catch { prompt("Copy this link:", b.dataset.copy); }
+    setTimeout(() => b.textContent = orig, 1500);
+  });
+  $app.querySelectorAll("[data-sum]").forEach(b => b.onclick = () => srvSummary(b.dataset.sum));
+  $app.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => srvBranchDetails(b.dataset.edit));
+  document.getElementById("create").onclick = async () => {
+    const name = document.getElementById("newname").value.trim(); if (!name) return;
+    const btn = document.getElementById("create"); btn.disabled = true; btn.textContent = "Creating…";
+    try { const r = await apiCall("POST", null, {action: "create", name}); srvBranchDetails(r.branch.id); }
+    catch (e){ btn.disabled = false; btn.textContent = "Create branch"; setStatus(e.message, true); }
+  };
+}
+async function srvBranchDetails(id){
+  let data; try { data = await apiCall("GET", {b: id}); } catch (e){ return srvPM(`<div class="banner err">${esc(e.message)}</div>`); }
+  const br = data.branch, values = {...(br.values || {})};
+  $app.innerHTML = `<button class="back noprint" id="backpm">← All branches</button>
+    <h1>BRANCH DETAILS</h1><div class="sub">${esc(br.name)} · the departments see this, locked</div>
+    <div id="form">${renderSection("branch", values)}</div>
+    <div class="card"><div class="actions"><button class="btn green" id="savebr">Save branch details</button>
+      <button class="btn sec2" id="tolist">Back to branches</button></div><p class="note" id="brnote"></p></div>`;
+  fillInputs(document.getElementById("form"), values);
+  const $form = document.getElementById("form");
+  $form.addEventListener("input", e => { const el = e.target; if (el.dataset.k && el.type !== "checkbox") values[el.dataset.k] = el.value; });
+  $form.addEventListener("change", e => {
+    const el = e.target; if (!el.dataset.k || el.type !== "checkbox") return;
+    const g = el.dataset.g;
+    if (g && el.checked && !MULTI.has(g)) $form.querySelectorAll(`input[data-g="${g}"]`).forEach(o => {
+      if (o !== el && o.checked){ o.checked = false; values[o.dataset.k] = false; o.closest(".opt").classList.remove("on"); } });
+    values[el.dataset.k] = el.checked;
+    const lab = el.closest(".opt"); if (lab) lab.classList.toggle("on", el.checked);
+  });
+  document.getElementById("backpm").onclick = () => srvPM();
+  document.getElementById("tolist").onclick = () => srvPM();
+  document.getElementById("savebr").onclick = async () => {
+    try { await apiCall("POST", null, {action: "branch", b: id, values});
+      srvPM(`<div class="banner ok">Branch details saved. Now send the branch link to the departments – they will see these details locked.</div>`); }
+    catch (e){ document.getElementById("brnote").innerHTML = `<span style="color:var(--red)">${esc(e.message)}</span>`; }
+  };
+}
+async function srvSummary(id){
+  let data; try { data = await apiCall("GET", {b: id}); } catch (e){ return srvPM(`<div class="banner err">${esc(e.message)}</div>`); }
+  const br = data.branch, ans = {...data.answers, branch: {values: br.values || {}}};
+  $app.innerHTML = `<button class="back noprint" id="backpm2">← All branches</button>
+    <h1>CILANTRO – CONSOLIDATED REQUIREMENTS</h1>
+    <div class="sub">${esc(br.name)} · filled automatically from the departments · read-only</div>
+    <div class="card noprint"><div class="pmhead"><div><b style="color:var(--ink)">Department progress</b>
+      <div class="chips" style="margin-top:6px">${progressChips(Object.fromEntries(DEPTS.map(d => [d, data.answers[d] || null])))}</div></div>
+      <div class="actions" style="margin:0"><button class="btn sec2 small" id="refresh">↻ Refresh</button>
+      <button class="btn small" id="printit">Print / Save as PDF</button></div></div></div>
+    <div class="sumwrap">${summaryTable("A. ARCHITECTURE DESIGN HOUSE REQUIREMENTS", col("A"), SPEC.A, ans, "the architecture design house")}</div>
+    <div class="sumwrap">${summaryTable("B. MEP REQUIREMENTS", col("B"), SPEC.B, ans, "the MEP consultant / contractor")}</div>`;
+  document.getElementById("backpm2").onclick = () => srvPM();
+  document.getElementById("refresh").onclick = () => srvSummary(id);
+  document.getElementById("printit").onclick = () => window.print();
+}
+function srvStart(){
+  const b = qp.get("b"), k = qp.get("k");
+  if (b) srvBranch(b, k || "");
+  else srvPM();
+}
+
+function bootLocal(){
+window.addEventListener("hashchange", () => location.reload());
+  const incoming = answersFromHash();
+  if (incoming){
+    addToPM(incoming);
+    try { history.replaceState(null, "", location.pathname); } catch {}
+    pmPage(`<div class="banner ok">✓ Answers received from ${incoming.map(a => esc(NAMES[a.d]) + (a.by ? " (" + esc(a.by) + ")" : "")).join(", ")} for branch <b>${esc(incoming[0].branch || "")}</b>. Sections A & B are updated below.</div>`);
+    try { sessionStorage.setItem("cil_view", "pm"); } catch {}
+  } else {
+    let startView = "home"; try { startView = sessionStorage.getItem("cil_view") || "home"; } catch {}
+    go(DEPTS.includes(startView) || startView === "pm" || startView === "share" ? startView : "home");
+  }
+  
+}
+
+(async () => {
+  SERVER = await detectServer();
+  if (SERVER){ srvStart(); return; }
+  bootLocal();
+})();
 </script>
 
 </body>
