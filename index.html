@@ -801,7 +801,8 @@ async function srvPM(flash){
     <div class="card"><p class="step">New branch</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="newname" placeholder="Branch name, e.g. Cilantro Mall of Egypt" style="flex:1;min-width:220px">
       <button class="btn green" id="create">Create branch</button></div>
-      <p class="note" style="margin:8px 0 0">You then fill in the branch details, and the departments see them locked.</p></div>
+      <p class="note" style="margin:8px 0 0">You then fill in the branch details, and the departments see them locked.
+      When a branch is finished, print Sections A &amp; B first, then <b>Delete</b> it to keep this list short.</p></div>
     <div id="list"></div>`;
   const $list = document.getElementById("list");
   if (!data.branches.length) $list.innerHTML = `<p class="center note">No branches yet – create the first one above.</p>`;
@@ -816,7 +817,8 @@ async function srvPM(flash){
         <button class="btn sec2 small" data-copy="${esc(link)}">Copy link</button>
         <a class="btn green small" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">WhatsApp</a>
         <a class="btn sec2 small" target="_blank" rel="noopener" href="mailto:?subject=${encodeURIComponent("Cilantro Store Requirements – " + br.name)}&body=${encodeURIComponent(msg)}">Email</a>
-        <button class="btn small" data-sum="${br.id}">Consolidated A &amp; B</button></div></div>
+        <button class="btn small" data-sum="${br.id}">Consolidated A &amp; B</button>
+        <button class="btn sec2 small" data-del="${br.id}" data-name="${esc(br.name)}" style="color:var(--red);border-color:var(--red)">Delete</button></div></div>
       <div class="chips" style="margin-top:8px">${progressChips(br.progress)}</div>`;
     $list.appendChild(el);
   }
@@ -826,6 +828,17 @@ async function srvPM(flash){
     setTimeout(() => b.textContent = orig, 1500);
   });
   $app.querySelectorAll("[data-sum]").forEach(b => b.onclick = () => srvSummary(b.dataset.sum));
+  $app.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    if (b.dataset.sure !== "1"){
+      b.dataset.sure = "1"; b.textContent = "Click again to delete for good";
+      setTimeout(() => { if (b.dataset.sure === "1"){ b.dataset.sure = ""; b.textContent = "Delete"; } }, 6000);
+      return;
+    }
+    b.disabled = true; b.textContent = "Deleting…";
+    try { await apiCall("POST", null, {action: "delete", b: b.dataset.del});
+      srvPM(`<div class="banner ok">Branch <b>${b.dataset.name}</b> and all its answers were deleted.</div>`); }
+    catch (e){ b.disabled = false; b.textContent = "Delete"; setStatus(e.message, true); }
+  });
   $app.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => srvBranchDetails(b.dataset.edit));
   document.getElementById("create").onclick = async () => {
     const name = document.getElementById("newname").value.trim(); if (!name) return;
