@@ -796,7 +796,7 @@ async function srvPM(flash){
   let data;
   try { data = await apiCall("GET", {list: 1}); }
   catch (e){ PMPIN = ""; try { sessionStorage.removeItem("cil_pin"); } catch {} return srvPinGate(e.message); }
-  $app.innerHTML = `<h1>CILANTRO – STORE REQUIREMENTS FORM</h1><div class="sub">PM control panel · answers are saved on this website</div>
+  $app.innerHTML = `<h1>CILANTRO – STORE REQUIREMENTS FORM</h1><div class="sub">PM control panel · answers are saved on this website · <b>version 24 Sept 2026 (delete enabled)</b></div>
     ${flash || ""}
     <div class="card"><p class="step">New branch</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="newname" placeholder="Branch name, e.g. Cilantro Mall of Egypt" style="flex:1;min-width:220px">
